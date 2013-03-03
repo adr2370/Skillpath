@@ -38,9 +38,10 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 		<script src='//cdn.firebase.com/v0/firebase.js'></script>
 		<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
 		<script src="js/bootstrap.js" type="text/javascript"></script>
 		<script src="js/fireFunctions.js" type="text/javascript"></script>
-		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="js/drawGraph.js" type="text/javascript"></script>
 		<script>
 			var authClient = new FirebaseAuthClient(fb,function(){});
 			var userid=authClient.readCookie("cookie");
@@ -231,7 +232,7 @@
 											var dictionary=new Object();
 											dictionary.nodes=trees;
 											dictionary.links=edges;
-											console.log(JSON.stringify(dictionary));
+											drawGraph(dictionary);
 										}
 									}
 								});
