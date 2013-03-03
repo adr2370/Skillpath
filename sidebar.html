@@ -48,7 +48,7 @@
 			});
 			userfb.child("categories").on("child_added", function(data) {
 				fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
-					$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+					addToCategoryList(data.name(),data2.val());
 					$("#"+data.name()).attr("onclick","switchToTopDir('"+data.name()+"')");
 				});
 			});
@@ -60,37 +60,47 @@
 					});
 				});
 			});
+			function addToCategoryList(id,name) {
+				$("#categories").append("<div class='btn btn-inverse' style='width:200px; float: left;clear: both;' id='"+id+"'>"+name+"</div>");
+			}
 			function goBack() {
 				if(dirLevels.length<=1) {
 					$("#back").text("");
+					$("#back").removeClass("btn");
+					$("#back").removeClass("btn-danger");
 				}
 				if(dirLevels.length>0) {
 					$("#categories").html(dirLevels[dirLevels.length-1]);
 					dirLevels.splice(dirLevels.length-1, 1);
-					var t=$("#path").text();
+					var t=$("#path").html();
 					t=t.substring(0,t.length-1);
-					$("#path").text(t.substring(0,1+t.lastIndexOf("/")));
+					$("#path").html(t.substring(0,1+t.lastIndexOf("/")));
 				}
 			}
 			function clearCategories() {
 				dirLevels[dirLevels.length]=$("#categories").html();
 				$("#categories").html("");
 				$("#back").text("Go Back");
+				$("#back").addClass("btn");
+				$("#back").addClass("btn-danger");
+			}
+			function addToPath(id) {
+				$("#path").html($("#path").html()+$("#"+id).text()+"/");
 			}
 			function switchToTopDir(id) {
-				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				addToPath(id);
 				clearCategories();
 				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 					dtop.forEach(function(data) {
 						fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
-							$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+							addToCategoryList(data.name(),data2.val());
 							$("#"+data.name()).attr("onclick","switchToSubCategory('"+id+"','"+data.name()+"');");
 						});
 					});
 				});
 			}
 			function switchToSubCategory(treeid,id) {
-				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				addToPath(id);
 				clearCategories();
 				//check if it is a leaf
 				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
@@ -102,7 +112,7 @@
 					} else {
 						dtop.forEach(function(data) {
 							fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
-								$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+								addToCategoryList(data.name(),data2.val());
 								$("#"+data.name()).attr("onclick","switchToSubCategory('"+treeid+"','"+data.name()+"');");
 							});
 						});
@@ -113,14 +123,14 @@
 				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 					dtop.forEach(function(data) {
 						fb.child("node").child(data.name()).child("name").once("value", function(data2) {
-							$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+							addToCategoryList(data.name(),data2.val());
 							$("#"+data.name()).attr("onclick","switchToSubTutorialTree('"+id+"','"+data.name()+"');");
 						});
 					});
 				});
 			}
 			function switchToSubTutorialTree(treeid,id) {
-				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				addToPath(id);
 				clearCategories();
 				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
 					var count=0;
@@ -130,7 +140,7 @@
 					} else {
 						dtop.forEach(function(data) {
 							fb.child("node").child(data.name()).child("name").once("value", function(data2) {
-								$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+								addToCategoryList(data.name(),data2.val());
 								$("#"+data.name()).attr("onclick","switchToSubTutorialTree('"+treeid+"','"+data.name()+"');");
 							});
 						});

@@ -90,8 +90,8 @@ function addUserCategory(userid,category) {
 function addCompletedNode(userid,node) {
 	fb.child("user").child(userid).child("completed").child(node).set(1);
 }
-function addGoal(userid,node) {
-	fb.child("user").child(userid).child("goals").child(node).set(1);
+function addGoal(userid,tree,node) {
+	fb.child("user").child(userid).child("goals").child(node).set(tree);
 }
 function removeUserCategory(userid,category) {
 	fb.child("user").child(userid).child("categories").child(category).set(null);
