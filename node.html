@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body>
+<h1></h1>
+<div id="nodeContainer"></div>
+<div id="urlContainer"></div>
+<div style="position: fixed; right: 0px; top: 0px; height: 100%; width: 250px; background-color: grey;">
+	<div style="float: left; margin-left: 10px; margin-top: 10px;">
+		<img id="photo" src="">
+	</div>
+	<div id="name" style="float: left; margin-left: 10px; margin-top: 26px; font-size: 18px;"></div>
+	<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
+		<input placeholder="Search..." style=" width: 222px;">
+	</div>
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src='//cdn.firebase.com/v0/firebase.js'></script>
+<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
+<script src='js/underscore-min.js'></script>
+<script src='js/fireFunctions.js'></script>
+<script>
+
+// Thank you http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values
+// Gets node id from URL
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
+
+var nodeId = urlParams["id"];
+
+// Updates H1 & grabs node links
+fb.child("node").child(nodeId).on("value", function(snapshot) {
+	var nodeName = snapshot.val().name,
+	nodeLinks = snapshot.val().links;
+	var links = [];
+
+	$('h1').text(nodeName);
+	$.each( nodeLinks, function(key,value) {
+		url = window.atob(key); // Reverses base64
+		links.push('<p><a href="'+url+'">'+url+'</a></p><p class="upVote" data-nodelink="'+key+'">Up: '+value.up+'</p><p class="downVote" data-nodelink="'+key+'">Down: '+value.down+'</p>');
+	});
+	$('#urlContainer').html(links.join(''));
+});
+
+// Pushes upvotes to firebase
+$('#urlContainer').on('click', '.upVote', function() {
+	var nodeLink = $(this).data('nodelink');
+	addUpVote(nodeId,nodeLink);
+});
+
+// Pushes downvotes to firebase
+$('#urlContainer').on('click', '.downVote', function() {
+	var nodeLink = $(this).data('nodelink');
+	addDownVote(nodeId,nodeLink);
+});
+
+
+// -IoiqNV6EpzYFBHCVSiP
+// addLink('-IoiqNV6EpzYFBHCVSiP','http://www.facebook.com')
+
+</script>	
+
+</body>
+</html>
