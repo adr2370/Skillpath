@@ -16,7 +16,7 @@ function removeConnection(tree,parent,child) {
 	updateNodeLevel(tree,child);
 }
 function addLink(node,url) {
-	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0});
+	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0, url:window.btoa(url)});
 }
 function removeLink(node,url) {
 	fb.child("node").child(node).child("links").child(window.btoa(url)).set(null);
