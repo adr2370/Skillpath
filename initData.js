@@ -25,3 +25,7 @@ addConnection(music,string,bass);
 addConnection(cello,strings,notes);
 addConnection(cello,fingering,notes);
 addUserCategory("100001711440164",music);
+for(var i=0;i<10;i++) {
+	var x=addTree(i,"tree");
+	addUserCategory("100001711440164",x);
+}

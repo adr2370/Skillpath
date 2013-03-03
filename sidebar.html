@@ -61,7 +61,7 @@
 					tree.id=t.name();
 					tree.name=t.child("name").val();
 					names[tree.name]=tree;
-					listNames.push(tree.name);
+					listNames.push(tree.name+"");
 				});
 			});
 			$("#search").typeahead({
@@ -123,6 +123,123 @@
 					});
 				});
 			});
+			function getMainGraph() {
+				var trees=[];
+				var lookup=[];
+				trees[0]={name:"me", id:0, index:0, color:0};
+				lookup[0]=0;
+				var edges=[];
+				var count=0;
+				var overallCount=0;
+				userfb.child("categories").once("value", function(data) {
+					data.forEach(function(treeTot) {
+						count++;
+						var tree=treeTot.name();
+						fb.child("tree").child(tree).child("name").once("value", function(d) {
+							var t=new Object();
+							t.id=tree;
+							t.name=d.val();
+							overallCount++;
+							t.color=overallCount;
+							t.index=trees.length;
+							lookup[t.id]=t.index;
+							trees.push(t);
+							edges.push({source:0,target:trees.length-1,value:10});
+							count--;
+							if(count==0) {
+								addCategoryTrees(trees,edges,lookup);
+							}
+						});
+					});
+				});
+			}
+			function addCategoryTrees(trees,edges,lookup) {
+				var topTrees=[];
+				var count=0;
+				for(var i=1;i<trees.length;i++) topTrees.push(trees[i]);
+				for(var i=0;i<topTrees.length;i++) {
+					count++;
+					fb.child("tree").child(topTrees[i].id).once("value", function(data) {
+						if(data.child("nodes").val()==undefined) {
+							count--;
+						} else {
+							var nodeCount=0;
+							data.child("nodes").forEach(function(node) {
+								nodeCount++;
+								fb.child("tree").child(node.name()).child("name").once("value", function(nodeName) {
+									var n=new Object();
+									n.id=node.name();
+									n.name=nodeName.val();
+									var index=lookup[data.name()];
+									n.color=topTrees[index-1].color;
+									n.index=trees.length;
+									lookup[n.id]=n.index;
+									trees.push(n);
+									if(node.child("level").val()==0) {
+										edges.push({source:index,target:n.index,value:5});
+									} else {
+										node.child("parents").forEach(function(parent) {
+											edges.push({source:lookup[parent.name()],target:n.index,value:3});
+										});
+									}
+									nodeCount--;
+									if(nodeCount==0) {
+										count--;
+										if(count==0) {
+											addSkillTrees(trees,edges,lookup,topTrees.length+1);
+										}
+									}
+								});
+							});
+						}
+					});
+				}
+			}
+			function addSkillTrees(trees,edges,lookup,startSpot) {
+				var topTrees=[];
+				var count=0;
+				for(var i=startSpot;i<trees.length;i++) topTrees.push(trees[i]);
+				for(var i=0;i<topTrees.length;i++) {
+					count++;
+					fb.child("tree").child(topTrees[i].id).once("value", function(data) {
+						if(data.child("nodes").val()==undefined) {
+							count--;
+						} else {
+							var nodeCount=0;
+							data.child("nodes").forEach(function(node) {
+								nodeCount++;
+								fb.child("node").child(node.name()).child("name").once("value", function(nodeName) {
+									var n=new Object();
+									n.id=node.name();
+									n.name=nodeName.val();
+									var index=lookup[data.name()];
+									n.color=topTrees[index-startSpot].color;
+									n.index=trees.length;
+									lookup[n.id]=n.index;
+									trees.push(n);
+									if(node.child("level").val()==0) {
+										edges.push({source:index,target:n.index,value:2});
+									} else {
+										node.child("parents").forEach(function(parent) {
+											edges.push({source:lookup[parent.name()],target:n.index,value:1});
+										});
+									}
+									nodeCount--;
+									if(nodeCount==0) {
+										count--;
+										if(count==0) {
+											var dictionary=new Object();
+											dictionary.nodes=trees;
+											dictionary.links=edges;
+											console.log(JSON.stringify(dictionary));
+										}
+									}
+								});
+							});
+						}
+					});
+				}
+			}
 			function toggleCheck(check) {
 				var checked=$("#"+check+" label input").is(':checked');
 				if(checked) {
