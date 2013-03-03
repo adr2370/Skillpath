@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+
+.link {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+.text {
+  font-size: 11px;
+  pointer-events: none;
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+function drawTree(inNodes, inLevels){
+var graph = {nodes:inNodes,levels:inLevels};
+var width = 960,
+  height = 600;
+  radius = 50;
+
+var color = d3.scale.category20();
+
+
+//d3.json("treeData.json", function(graph) {
+  var nodes = [];
+  var links = []
+  var lookup = {};
+  var levelDepth = graph.levels.length;
+  var currentLevel = 1;
+  graph.levels.forEach(function(l) {
+    var levelIndex = 1;
+    l.forEach(function(node) {
+      var newNode = {};
+      newNode["x"] = width/(l.length+1)*levelIndex;
+      newNode["y"] = height/(levelDepth+1)*currentLevel;
+      newNode["name"] = graph.nodes[node].name;
+      newNode["children"] = graph.nodes[node].forward; 
+      lookup[node] = nodes.length; //Lookup table between node indices in "graph.nodes" and "nodes"
+      nodes.push(newNode);
+      levelIndex+=1;
+    });
+    currentLevel+=1;
+  });
+
+  nodes.forEach( function(node) {
+    node.children.forEach( function(child) {
+      links.push({source:node,target:nodes[lookup[child]]});
+    });
+  });
+
+console.log(links);
+
+
+
+var svg = d3.select("body").append("svg")
+    .attr("width",width)
+    .attr("height",height)
+   .append("g");
+
+svg.selectAll(".link")
+    .data(links)
+  .enter().append("svg:line")
+    .attr("x1",function(d) {return d.source.x; })
+    .attr("y1",function(d) {return d.source.y; })
+    .attr("x2",function(d) {return d.target.x; })
+    .attr("y2",function(d) {return d.target.y; })
+    .style("stroke", "rgb(0,0,0)");
+
+
+
+svg.selectAll(".node")
+    .data(nodes)
+  .enter().append("circle")
+    .attr("class","node")
+    .attr("r",radius)
+    .attr("cx", function(d) { return d.x })
+    .attr("cy", function(d) { return d.y })
+    .style("fill", function(d) { return color(5); })
+  .append("title")
+    .text(function(d) { return d.name; });
+
+svg.selectAll("text")
+    .data(nodes)
+  .enter().append("svg:text")
+    .attr("x", function(d) { return d.x})
+    .attr("y", function(d) { return d.y})
+    .attr("text-anchor", "middle")
+    .text(function(d) { return d.name; });
+});
+</script>
