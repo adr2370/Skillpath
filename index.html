@@ -8,18 +8,57 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+    <style>
+	.something {
+		background-image: url('img/aboveFoldBg.jpg');
+		background-size: cover;
+		height:500px;
+
+	}
+    </style>
 </head>
 <body>
 <div class="container">
 	<div class="row">
-		<div class="span9">
-			rawr
-		</div>
-		<div class="span3">
-			rawr
-		</div>
+		<h1 id="facebookLogin">Facebook</h1>
+
 	</div>
 </div>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src='//cdn.firebase.com/v0/firebase.js'></script>
+<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
+<script src='js/fireFunctions.js'></script>
+<script>
+var authClient = new FirebaseAuthClient(fb, function(error, user) {
+	if (error) {
+		console.log(error);
+	} else if (user) {
+		fb.child("user").child(user.id).on('value', function(snapshot) {
+			if (snapshot.val() === null) {
+				var userid = user.id,
+				name = user.name,
+				photo = 'https://graph.facebook.com/'+user.id+'/picture?type=large',
+				email = user.email;
+
+				addUser(userid,name,photo,email);
+			} else {
+				window.location.href='home.html'
+			}
+		});
+	} else {
+		console.log('not logged in');
+	}
+});
+
+
+
+$(document).ready(function() {
+	$('#facebookLogin').click(function() {
+		authClient.login('facebook', {
+			scope: 'email'
+		});
+	});
+});
+</script>
 </body>
 </html>
