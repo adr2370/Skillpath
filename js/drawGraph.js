@@ -1,33 +1,35 @@
-var w = window.innerWidth,
-    h = window.innerHeight,
-    r = 720,
-    x = d3.scale.linear().range([0, r]),
-    y = d3.scale.linear().range([0, r]);
-var svg = d3.select("body").append("svg")
-.attr("width", w)
-.attr("height", h)
-.attr("pointer-events","all");
 
-svg.append("svg:rect")
-.attr("width",w)
-.attr("height",h)
-.attr("fill","white");
-//.style("opacity",0);
-
-function redraw() {
-  console.log("here",d3.event.translate,d3.event.scale);
-  svg.attr("transform","translate("+d3.event.translate+" scale("+d3.event.scale+")");
-}
 
 function drawGraph(graph){
+	var w = window.innerWidth-250,
+	    h = window.innerHeight-10,
+	    r = 720,
+	    x = d3.scale.linear().range([0, r]),
+	    y = d3.scale.linear().range([0, r]);
+	var svg = d3.select("#graph").append("svg")
+	.attr("width", w)
+	.attr("height", h)
+	.attr("pointer-events","all");
+
+	svg.append("svg:rect")
+	.attr("width",w)
+	.attr("height",h)
+	.attr("fill","white");
+	//.style("opacity",0);
+
+	function redraw() {
+	  console.log("here",d3.event.translate,d3.event.scale);
+	  svg.attr("transform","translate("+d3.event.translate+" scale("+d3.event.scale+")");
+	}
+	
   var width = w,
       height = h;
 
   var color = d3.scale.category20();
 
   var force = d3.layout.force()
-    .linkDistance(150)
-    .friction(0.3)
+    .linkDistance(50)
+    .friction(0.2)
     .gravity(0.3)
     .size([width, height]);
 
@@ -70,6 +72,8 @@ function drawGraph(graph){
     .style("opacity",1);
 
   force.on("tick", function() {
+	  graph.nodes[0].x = w / 2;
+	  graph.nodes[0].y = h / 2;
       link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
