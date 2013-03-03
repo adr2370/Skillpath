@@ -33,20 +33,17 @@ var authClient = new FirebaseAuthClient(fb, function(error, user) {
 	if (error) {
 		console.log(error);
 	} else if (user) {
-		fb.child("user").child(user.id).on('value', function(snapshot) {
-			if (snapshot.val() === null) {
-				var userid = user.id,
-				name = user.name,
-				photo = 'https://graph.facebook.com/'+user.id+'/picture',
-				email = user.email;
+		var userid = user.id,
+		name = user.name,
+		photo = 'https://graph.facebook.com/'+user.id+'/picture',
+		email = user.email;
 
-				addUser(userid,name,photo,email);
-			} else {
-				window.location.href='home.html'
-			}
-		});
+		addUser(userid,name,photo,email);
+
+		authClient.writeCookie('cookie', userid);
+		window.location.href='home.html'
 	} else {
-		console.log('not logged in');
+		console.log('Not logged in');
 	}
 });
 
