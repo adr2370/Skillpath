@@ -47,14 +47,20 @@ var nodeId = urlParams["id"];
 
 // Updates H1 & grabs node links
 fb.child("node").child(nodeId).on("value", function(snapshot) {
+
 	var nodeName = snapshot.val().name,
-	nodeLinks = snapshot.val().links;
+	nodeLinks = snapshot.val().links, 
+	sortedLinks = _.chain(nodeLinks)
+		.sortBy(function(link){ return link.down-link.up; })
+		.map(function(link){ return { "url": link.url, "up": link.up, "down": link.down } } )
+		.value();
 	var links = [];
 
 	$('h1').text(nodeName);
-	$.each( nodeLinks, function(key,value) {
-		url = window.atob(key); // Reverses base64
-		links.push('<p><a href="'+url+'">'+url+'</a></p><p class="upVote" data-nodelink="'+key+'">Up: '+value.up+'</p><p class="downVote" data-nodelink="'+key+'">Down: '+value.down+'</p>');
+	// console.log(sortedLinks);
+	$.each( sortedLinks, function(key,value) {
+		url = window.atob(value.url); // Reverses base64
+		links.push('<p><a href="'+url+'">'+url+'</a></p><p class="upVote" data-nodelink="'+value.url+'">Up: '+value.up+'</p><p class="downVote" data-nodelink="'+value.url+'">Down: '+value.down+'</p>');
 	});
 	$('#urlContainer').html(links.join(''));
 });
