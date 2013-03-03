@@ -113,8 +113,7 @@
 					});
 				}
 			});
-			//if(userid==null) window.location.href="index.html";
-			userid=100001711440164;
+			if(userid==null) window.location.href="index.html";
 			var userfb=fb.child("user").child(userid);
 			userfb.child("name").on("value", function(data) {
 				$("#name").text(data.val());
@@ -228,11 +227,13 @@
 				}
 			}
 			function addSkillTrees(trees,edges,lookup,startSpot) {
+				var secondLookup=[];
 				var topTrees=[];
 				var count=0;
 				for(var i=startSpot;i<trees.length;i++) topTrees.push(trees[i]);
 				for(var i=0;i<topTrees.length;i++) {
 					count++;
+					secondLookup[topTrees[i].id]=[];
 					fb.child("tree").child(topTrees[i].id).once("value", function(data) {
 						if(data.child("nodes").val()==undefined) {
 							count--;
@@ -247,13 +248,13 @@
 									var index=lookup[data.name()];
 									n.color=topTrees[index-startSpot].color;
 									n.index=trees.length;
-									lookup[n.id]=n.index;
+									secondLookup[data.name()][n.id]=n.index;
 									trees.push(n);
 									if(node.child("level").val()==0) {
 										edges.push({source:index,target:n.index,value:2});
 									} else {
 										node.child("parents").forEach(function(parent) {
-											edges.push({source:lookup[parent.name()],target:n.index,value:1});
+											edges.push({source:secondLookup[data.name()][parent.name()],target:n.index,value:1});
 										});
 									}
 									nodeCount--;

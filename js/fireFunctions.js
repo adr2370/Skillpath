@@ -21,7 +21,6 @@ function addLink(node,url) {
 function removeLink(node,url) {
 	fb.child("node").child(node).child("links").child(window.btoa(url)).set(null);
 }
-
 function addUpVote(node,link,userid) {
 	var linkRef = fb.child("node").child(node).child("links").child(link);
 	linkRef.child("voters").child(userid).once("value", function(position) {
