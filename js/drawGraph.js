@@ -18,7 +18,6 @@ function drawGraph(graph){
 	//.style("opacity",0);
 
 	function redraw() {
-	  console.log("here",d3.event.translate,d3.event.scale);
 	  svg.attr("transform","translate("+d3.event.translate+" scale("+d3.event.scale+")");
 	}
 	
@@ -39,7 +38,6 @@ function drawGraph(graph){
     .nodes(graph.nodes)
     .links(graph.links)
     .start();
-  console.log(repulsion);
 
   var link = svg.selectAll(".link")
     .data(graph.links)
