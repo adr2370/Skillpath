@@ -70,7 +70,10 @@ function updateNodeLevel(tree,node) {
 }
 function changeNodeLevel(tree,node,newLevel) {
 	fb.child("tree").child(tree).child("nodes").child(node).child("level").once("value", function(dataSnapshot) {
-		fb.child("tree").child(tree).child("levels").child(dataSnapshot.val()).child(node).set(null);
+		try {
+			fb.child("tree").child(tree).child("levels").child(dataSnapshot.val()).child(node).set(null);
+		}
+		catch(err) {}
 		fb.child("tree").child(tree).child("levels").child(newLevel).child(node).set(1);
 		fb.child("tree").child(tree).child("nodes").child(node).child("level").set(newLevel);
 	});

@@ -10,7 +10,7 @@
 		<link rel="stylesheet" href="css/bootstrap-responsive.min.css" type="text/css">
 	</head>
 	<body>
-		<div style="position: absolute; right: 0px; top: 0px; height: 100%; width: 20%; background-color: grey;">
+		<div style="position: absolute; right: 0px; top: 0px; height: 100%; width: 250px; background-color: grey;">
 			<div style="float: left; margin-left: 10px; margin-top: 10px;">
 				<img id="photo" src="">
 			</div>
@@ -19,9 +19,8 @@
 			<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
 				<input placeholder="Search..." style=" width: 222px;">
 			</div>
-			<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
-				My Categories
-			</div>
+			<div id="path" style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">/</div>
+			<div id="back" style="float: right; margin-right: 10px; margin-top: 10px;" onclick="goBack();"></div>
 			<div id="categories" style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
 			</div>
 			<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
@@ -35,42 +34,109 @@
 		<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
 		<script src="js/fireFunctions.js" type="text/javascript"></script>
 		<script>
-			var userid;
-			function init() {
-				var userfb=fb.child("user").child(user);
-				userfb.child("name").on("value", function(data) {
-					$("#name").text(data.val());
+			var authClient = new FirebaseAuthClient(fb,function(){});
+			var userid=authClient.readCookie("cookie");
+			var dirLevels=[];
+			//if(userid==null) window.location.href="index.html";
+			userid=100001711440164;
+			var userfb=fb.child("user").child(userid);
+			userfb.child("name").on("value", function(data) {
+				$("#name").text(data.val());
+			});
+			userfb.child("photo").on("value", function(data) {
+				$("#photo").attr("src",data.val());
+			});
+			userfb.child("categories").on("child_added", function(data) {
+				fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
+					$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+					$("#"+data.name()).attr("onclick","switchToTopDir('"+data.name()+"')");
 				});
-				userfb.child("photo").on("value", function(data) {
-					$("#photo").src(data.val());
+			});
+			userfb.child("goals").on("child_added", function(data) {
+				fb.child("node").child(data.name()).child("name").once("value", function(data2) {
+					$("#goals").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+					$("#"+data.name()).click(function() {
+						//switch to goal this.id
+					});
 				});
-				userfb.child("categories").on("child_added", function(data) {
-					$("#categories").append(data.name());
-				});
-				userfb.child("goals").on("child_added", function(data) {
-					$("#goals").append(data.name());
+			});
+			function goBack() {
+				if(dirLevels.length<=1) {
+					$("#back").text("");
+				}
+				if(dirLevels.length>0) {
+					$("#categories").html(dirLevels[dirLevels.length-1]);
+					dirLevels.splice(dirLevels.length-1, 1);
+					var t=$("#path").text();
+					t=t.substring(0,t.length-1);
+					$("#path").text(t.substring(0,1+t.lastIndexOf("/")));
+				}
+			}
+			function clearCategories() {
+				dirLevels[dirLevels.length]=$("#categories").html();
+				$("#categories").html("");
+				$("#back").text("Go Back");
+			}
+			function switchToTopDir(id) {
+				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				clearCategories();
+				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
+					dtop.forEach(function(data) {
+						fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
+							$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+							$("#"+data.name()).attr("onclick","switchToSubCategory('"+id+"','"+data.name()+"');");
+						});
+					});
 				});
 			}
-			var authClient = new FirebaseAuthClient(fb, function(error, user) {
-				if (error) {
-					console.log(error);
-				} else if (user) {
-					userid = user.id;
-					var name = user.name,
-					photo = 'https://graph.facebook.com/'+user.id+'/picture?type=large',
-					email = user.email;
-					addUser(userid,name,photo,email);
-					init();
-				} else {
-					console.log('not logged in');
-					window.location.href='index.html';
-				}
-			});
-			$(document).ready(function() {
-				authClient.login('facebook', {
-					scope: 'email'
+			function switchToSubCategory(treeid,id) {
+				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				clearCategories();
+				//check if it is a leaf
+				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
+					var count=0;
+					dtop.forEach(function() {count++;}); //count the children
+					if(count==0) {
+						//switch to tutorial tree
+						switchToTutorialTree(id);
+					} else {
+						dtop.forEach(function(data) {
+							fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
+								$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+								$("#"+data.name()).attr("onclick","switchToSubCategory('"+treeid+"','"+data.name()+"');");
+							});
+						});
+					}
 				});
-			});
+			}
+			function switchToTutorialTree(id) {
+				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
+					dtop.forEach(function(data) {
+						fb.child("node").child(data.name()).child("name").once("value", function(data2) {
+							$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+							$("#"+data.name()).attr("onclick","switchToSubTutorialTree('"+id+"','"+data.name()+"');");
+						});
+					});
+				});
+			}
+			function switchToSubTutorialTree(treeid,id) {
+				$("#path").text($("#path").text()+$("#"+id).text()+"/");
+				clearCategories();
+				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
+					var count=0;
+					dtop.forEach(function() {count++;}); //count the children
+					if(count==0) {
+						//go to the node page for this
+					} else {
+						dtop.forEach(function(data) {
+							fb.child("node").child(data.name()).child("name").once("value", function(data2) {
+								$("#categories").append("<div id='"+data.name()+"'>"+data2.val()+"</div>");
+								$("#"+data.name()).attr("onclick","switchToSubTutorialTree('"+treeid+"','"+data.name()+"');");
+							});
+						});
+					}
+				});
+			}
 		</script>
 	</body>
 </html>
