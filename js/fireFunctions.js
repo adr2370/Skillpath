@@ -1,5 +1,4 @@
 var fb = new Firebase("https://skillpath.firebaseio.com/");
-window.fb = fb;
 function addNode(name) {
 	return fb.child("node").push({name: name}).name();
 }
