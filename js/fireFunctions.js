@@ -4,13 +4,15 @@ function addNode(fb,name) {
 function removeNode(fb,node) {
 	fb.child("node").child(node).set(null);
 }
-function addConnection(fb,parent,child) {
-	fb.child("node").child(parent).child("children").child(child).set(1);
-	fb.child("node").child(child).child("parents").child(parent).set(1);
+function addConnection(fb,tree,parent,child) {
+	fb.child("tree").child(tree).child("nodes").child(parent).child("children").child(child).set(1);
+	fb.child("tree").child(tree).child("nodes").child(child).child("parents").child(parent).set(1);
+	updateNodeLevel(fb,tree,child);
 }
-function removeConnection(fb,parent,child) {
-	fb.child("node").child(parent).child("children").child(child).set(null);
-	fb.child("node").child(child).child("parents").child(parent).set(null);
+function removeConnection(fb,tree,parent,child) {
+	fb.child("tree").child(tree).child("nodes").child(parent).child("children").child(child).set(null);
+	fb.child("tree").child(tree).child("nodes").child(child).child("parents").child(parent).set(null);
+	updateNodeLevel(fb,tree,child);
 }
 function addLink(fb,node,url) {
 	return fb.child("node").child(node).child("links").child(url).set({down: 0, up: 0}).name();
@@ -35,24 +37,42 @@ function removeTree(fb,tree) {
 	fb.child("tree").child(tree).set(null);
 }
 function addNodeToTree(fb,tree,node) {
-	fb.child("node").child(node).once("value", function(nodeSnapshot) {
-		fb.child("tree").child(tree).child("levels").once("value", function(treeSnapshot) {
+	fb.child("tree").child(tree).child("nodes").child(node).child("level").set(0);
+	changeNodeLevel(fb,tree,node,0);
+}
+function updateNodeLevel(fb,tree,node) {
+	fb.child("tree").child(tree).child("nodes").child(node).once("value", function(nodeSnapshot) {
+		fb.child("tree").child(tree).once("value", function(snap) {
 			var parents=nodeSnapshot.child("parents");
+			var children=nodeSnapshot.child("children");
+			var nodes=snap.child("nodes");
 			var maxLevel=0;
 			parents.forEach(function(p) {
-				treeSnapshot.forEach(function(level) {
-					if(level.child(p.name()).val()!=null&&parseInt(level.name())+1>maxLevel) {
-						maxLevel=parseInt(level.name())+1;
+				if(nodes.child(p.name()).val()!=null) {
+					var curr=nodes.child(p.name()).child("level").val();
+					if(curr+1>maxLevel) {
+						maxLevel=curr+1;
 					}
-				});
+				}
 			});
-			fb.child("tree").child(tree).child("levels").child(maxLevel).child(node).set(1);
-		})
+			changeNodeLevel(fb,tree,node,maxLevel);
+			children.forEach(function(c) {
+				if(nodes.child(c.name()).val()!=null) {
+					var curr=nodes.child(c.name()).child("level").val();
+					if(curr<maxLevel+1) {
+						changeNodeLevel(fb,tree,c.name(),maxLevel+1);
+					}
+				}
+			});
+		});
 	});
 }
-function changeNodeLevel(fb,tree,node,oldLevel,newLevel) {
-	fb.child("tree").child(tree).child("levels").child(oldLevel).child(node).set(null);
-	fb.child("tree").child(tree).child("levels").child(newLevel).child(node).set(1);
+function changeNodeLevel(fb,tree,node,newLevel) {
+	fb.child("tree").child(tree).child("nodes").child(node).child("level").once("value", function(dataSnapshot) {
+		fb.child("tree").child(tree).child("levels").child(dataSnapshot.val()).child(node).set(null);
+		fb.child("tree").child(tree).child("levels").child(newLevel).child(node).set(1);
+		fb.child("tree").child(tree).child("nodes").child(node).child("level").set(newLevel);
+	});
 }
 function addUser(fb,userid,name,photo) {
 	fb.child("user").child(userid).set({name: name, photo: photo});
