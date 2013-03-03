@@ -16,19 +16,50 @@ function removeConnection(tree,parent,child) {
 	updateNodeLevel(tree,child);
 }
 function addLink(node,url) {
-	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0, url:window.btoa(url)});
+	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0, url: window.btoa(url)});
 }
 function removeLink(node,url) {
 	fb.child("node").child(node).child("links").child(window.btoa(url)).set(null);
 }
-function addDownVote(node,link) {
-	fb.child("node").child(node).child("links").child(link).child("down").once("value", function(dataSnapshot) {
-		fb.child("node").child(node).child("links").child(link).child("down").set(dataSnapshot.val()+1);
+
+function addUpVote(node,link,userid) {
+	var linkRef = fb.child("node").child(node).child("links").child(link);
+	linkRef.child("voters").child(userid).once("value", function(position) {
+		if ( position.val() === 'up' ) {
+		} else if ( position.val() === 'down' ) {
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()-1);
+			});
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("up");
+		} else {
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("up");
+		}
 	});
 }
-function addUpVote(node,link) {
-	fb.child("node").child(node).child("links").child(link).child("up").once("value", function(dataSnapshot) {
-		fb.child("node").child(node).child("links").child(link).child("up").set(dataSnapshot.val()+1);
+function addDownVote(node,link,userid) {
+	var linkRef = fb.child("node").child(node).child("links").child(link);
+	linkRef.child("voters").child(userid).once("value", function(position) {
+		if ( position.val() === 'down' ) {
+		} else if ( position.val() === 'up' ) {
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()-1);
+			});
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("down");
+		} else {
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("down");
+		}
 	});
 }
 function addTree(name,type) {

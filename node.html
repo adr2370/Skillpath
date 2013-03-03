@@ -27,30 +27,14 @@
 <script src='js/underscore-min.js'></script>
 <script src='js/fireFunctions.js'></script>
 <script>
-
-// Thank you http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values
-// Gets node id from URL
-var urlParams;
-(window.onpopstate = function () {
-    var match,
-        pl     = /\+/g,  // Regex for replacing addition symbol with a space
-        search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-        query  = window.location.search.substring(1);
-
-    urlParams = {};
-    while (match = search.exec(query))
-       urlParams[decode(match[1])] = decode(match[2]);
-})();
-
-var nodeId = urlParams["id"];
+var userid = getCookie('cookie');
+var nodeId = getUrlVars()['id'];
 
 // Updates H1 & grabs node links
-fb.child("node").child(nodeId).on("value", function(snapshot) {
-
-	var nodeName = snapshot.val().name,
-	nodeLinks = snapshot.val().links, 
-	sortedLinks = _.chain(nodeLinks)
+fb.child("node").child(nodeId).on("value", function(nodeInfo) {
+	var nodeName = nodeInfo.val().name;
+	var nodeLinks = nodeInfo.val().links;
+	var sortedLinks = _.chain(nodeLinks)
 		.sortBy(function(link){ return link.down-link.up; })
 		.map(function(link){ return { "url": link.url, "up": link.up, "down": link.down } } )
 		.value();
@@ -68,20 +52,41 @@ fb.child("node").child(nodeId).on("value", function(snapshot) {
 // Pushes upvotes to firebase
 $('#urlContainer').on('click', '.upVote', function() {
 	var nodeLink = $(this).data('nodelink');
-	addUpVote(nodeId,nodeLink);
+	addUpVote(nodeId,nodeLink,userid);
 });
 
 // Pushes downvotes to firebase
 $('#urlContainer').on('click', '.downVote', function() {
 	var nodeLink = $(this).data('nodelink');
-	addDownVote(nodeId,nodeLink);
+	addDownVote(nodeId,nodeLink,userid);
 });
 
+function getCookie(c_name) {
+    if (document.cookie.length > 0) {
+        c_start = document.cookie.indexOf(c_name + "=");
+        if (c_start != -1) {
+            c_start = c_start + c_name.length + 1;
+            c_end = document.cookie.indexOf(";", c_start);
+            if (c_end == -1) c_end = document.cookie.length;
+            return unescape(document.cookie.substring(c_start, c_end));
+        }
+    }
+    return "";
+}
 
-// -IoiqNV6EpzYFBHCVSiP
-// addLink('-IoiqNV6EpzYFBHCVSiP','http://www.facebook.com')
-
+// Gets node id from URL
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
 </script>	
-
 </body>
 </html>
