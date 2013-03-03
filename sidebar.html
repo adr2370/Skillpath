@@ -17,7 +17,7 @@
 			<div id="name" style="float: left; margin-left: 10px; margin-top: 26px; font-size: 18px;">
 			</div>
 			<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
-				<input placeholder="Search..." style=" width: 222px;">
+				<input id="search" type="text" data-provide="typeahead">
 			</div>
 			<div id="path" style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">/</div>
 			<div id="back" style="float: right; margin-right: 10px; margin-top: 10px;" onclick="goBack();"></div>
@@ -26,7 +26,10 @@
 			<div style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
 				Goals
 			</div>
-			<div id="back" class="btn btn-danger" style="float: right; margin-right: 10px; margin-top: 10px;" onclick="">Add Goal</div>
+			<div id="addGoalButton" class="btn btn-danger" style="float: right; margin-right: 10px; margin-top: 10px;" onclick="showAddingGoal();">Add Goal</div>
+			<div id="addingGoal" style="display:none;float: left;margin-left: 10px;margin-top: 10px;margin-bottom: -10px;">
+				<input id="addGoal" type="text" data-provide="typeahead">
+			</div>
 			<div id="goals" style="float: left; margin-left: 10px; margin-top: 10px; clear: both;">
 			</div>
 		</div>
@@ -35,6 +38,7 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 		<script src='//cdn.firebase.com/v0/firebase.js'></script>
 		<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
+		<script src="js/bootstrap.js" type="text/javascript"></script>
 		<script src="js/fireFunctions.js" type="text/javascript"></script>
 		<script src="http://d3js.org/d3.v3.min.js"></script>
 		<script>
@@ -46,6 +50,37 @@
 			var howFarIn=0;
 			var currCategoryTree="";
 			var currTutorialTree="";
+			var names=[];
+			var listNames=[];
+			var possibleGoals=[];
+			var listGoals=[];
+			fb.once("value", function(data) {
+				data.child("tree").forEach(function(t) {
+					var tree=new Object();
+					tree.type="tree";
+					tree.id=t.name();
+					tree.name=t.child("name").val();
+					names[tree.name]=tree;
+					listNames.push(tree.name);
+				});
+				data.child("node").forEach(function(n) {
+					var node=new Object();
+					node.type="node";
+					node.id=n.name();
+					node.name=n.child("name").val();
+					names[node.name]=node;
+					listNames.push(node.name);
+				});
+			});
+			$("#search").typeahead({
+				source: function (query, process) {
+					return listNames;
+				},
+				updater: function (item) {
+					console.log(item);
+					console.log(names[item]);
+				}
+			});
 			//if(userid==null) window.location.href="index.html";
 			userid=100001711440164;
 			var userfb=fb.child("user").child(userid);
@@ -63,12 +98,56 @@
 			});
 			userfb.child("goals").on("child_added", function(data) {
 				fb.child("node").child(data.name()).child("name").once("value", function(data2) {
-					$("#goals").append("<div class='btn btn-inverse' style='width:200px; float: left;clear: both;' id='"+data.name()+"'>"+data2.val()+"</div>");
-					$("#"+data.name()).click(function() {
-						getPathUp(data.val(),data.name());
+					fb.child("tree").child(data.val()).child("name").once("value", function(data3) {
+						$("#goals").append("<div class='btn btn-inverse' style='width:200px; float: left;clear: both;' id='"+data.name()+"'>"+data3.val()+"/"+data2.val()+"</div>");
+						$("#"+data.name()).click(function() {
+							getPathUp(data.val(),data.name());
+						});
 					});
 				});
 			});
+			function showAddingGoal() {
+				$('#addingGoal').show();
+				$("#addGoalButton").text("Hide");
+				$("#addGoalButton").attr("onclick","hideAddingGoal();");
+				fb.child("user").child(userid).once("value", function(data) {
+					data.child("categories").forEach(function(category) {
+						fb.child("tree").child(category.name()).once("value", function(trees) {
+							trees.child("nodes").forEach(function(tree) {
+								fb.child("tree").child(tree.name()).once("value", function(nodes) {
+									nodes.child("nodes").forEach(function(node) {
+										fb.child("node").child(node.name()).once("value", function(name) {
+											var nameOfGoal=trees.child("name").val()+"/"+nodes.child("name").val()+"/"+name.child("name").val();
+											listGoals.push(nameOfGoal);
+											var obj=new Object();
+											obj.category=trees.name();
+											obj.tree=nodes.name();
+											obj.node=name.name();
+											possibleGoals[nameOfGoal]=obj;
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+				$("#addGoal").typeahead({
+					source: function (query, process) {
+						return listGoals;
+					},
+					updater: function (item) {
+						var goal=possibleGoals[item];
+						addGoal(userid,goal.tree,goal.node);
+					}
+				});
+			}
+			function hideAddingGoal() {
+				$("#addingGoal").hide();
+				$("#addGoalButton").text("Add Goal");
+				$("#addGoalButton").attr("onclick","showAddingGoal();");
+				listGoals=[];
+				possibleGoals=[];
+			}
 			function getPathUp(treeid,id) {
 				//find which category the treeid belongs to
 				var category="";
