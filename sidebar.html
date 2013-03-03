@@ -133,6 +133,9 @@
 						}
 					});
 				});
+				if(count==0) {
+					getMainGraph();
+				}
 			});
 			userfb.child("goals").on("child_added", function(data) {
 				fb.child("node").child(data.name()).child("name").once("value", function(data2) {
@@ -172,6 +175,12 @@
 							}
 						});
 					});
+					if(count==0) {
+						var dictionary=new Object();
+						dictionary.nodes=trees;
+						dictionary.links=edges;
+						drawGraph(dictionary);
+					}
 				});
 			}
 			function addCategoryTrees(trees,edges,lookup) {

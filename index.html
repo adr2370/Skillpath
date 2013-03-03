@@ -63,7 +63,7 @@ var authClient = new FirebaseAuthClient(fb, function(error, user) {
 		addUser(userid,name,photo,email);
 
 		authClient.writeCookie('cookie', userid);
-		window.location.href='home.html'
+		window.location.href='sidebar.html'
 	} else {
 		console.log('Not logged in');
 	}

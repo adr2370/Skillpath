@@ -110,7 +110,9 @@ function changeNodeLevel(tree,node,newLevel) {
 	});
 }
 function addUser(userid,name,photo,email) {
-	fb.child("user").child(userid).set({name: name, photo: photo, email: email});
+	fb.child("user").child(userid).child("name").set(name);
+	fb.child("user").child(userid).child("photo").set(photo);
+	fb.child("user").child(userid).child("email").set(email);
 }
 function removeUser(userid) {
 	fb.child("user").child(userid).set(null);

@@ -32,7 +32,7 @@ function drawGraph(graph){
     .gravity(0.3)
     .size([width, height]);
 
-  repulsion = -1700*Math.sqrt(graph.nodes.length);
+  repulsion = -3700*Math.sqrt(graph.nodes.length);
   force
     .charge(repulsion)
     .nodes(graph.nodes)
@@ -72,6 +72,12 @@ function drawGraph(graph){
   force.on("tick", function() {
 	  graph.nodes[0].x = w / 2;
 	  graph.nodes[0].y = h / 2;
+	  for(var i=0;i<graph.nodes.length;i++) {
+		if(graph.nodes[i].x>w) graph.nodes[i].x=w;
+		if(graph.nodes[i].x<0) graph.nodes[i].x=0;
+		if(graph.nodes[i].y>h) graph.nodes[i].y=h;
+		if(graph.nodes[i].y<0) graph.nodes[i].y=0;
+	}
       link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
