@@ -74,8 +74,8 @@ function changeNodeLevel(fb,tree,node,newLevel) {
 		fb.child("tree").child(tree).child("nodes").child(node).child("level").set(newLevel);
 	});
 }
-function addUser(fb,userid,name,photo) {
-	fb.child("user").child(userid).set({name: name, photo: photo});
+function addUser(fb,userid,name,photo,email) {
+	fb.child("user").child(userid).set({name: name, photo: photo, email: email});
 }
 function removeUser(fb,userid) {
 	fb.child("user").child(userid).set(null);
