@@ -573,6 +573,26 @@
 				    .attr("text-anchor", "middle")
 					.attr("style","pointer-events: none;")
 				    .text(function(d) { return d.name; });
+				//have colors change when stuff is completed or not
+				var circleArray = $("#graph svg g circle");
+				for(var i=1;i<circleArray.length;i++) {
+					var id=circleArray[i].id;
+					console.log(id);
+					userfb.child("completed").child(id).once("value", function(data) {
+						if(data.val()==null) {
+							$("#graph svg g #"+data.name()).css("fill","#DD0000");
+						} else {
+							$("#graph svg g #"+data.name()).css("fill","#00DD00");
+						}
+					});
+					userfb.child("completed").child(id).on("value", function(data) {
+						if(data.val()==null) {
+							$("#graph svg g #"+data.name()).css("fill","#DD0000");
+						} else {
+							$("#graph svg g #"+data.name()).css("fill","#00DD00");
+						}
+					});
+				}
 			}
 			function goToNode(id) {
 				if(inTutorials) {
