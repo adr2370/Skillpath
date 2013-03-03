@@ -37,7 +37,7 @@ var authClient = new FirebaseAuthClient(fb, function(error, user) {
 			if (snapshot.val() === null) {
 				var userid = user.id,
 				name = user.name,
-				photo = 'https://graph.facebook.com/'+user.id+'/picture?type=large',
+				photo = 'https://graph.facebook.com/'+user.id+'/picture',
 				email = user.email;
 
 				addUser(userid,name,photo,email);
