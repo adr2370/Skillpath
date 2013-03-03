@@ -274,6 +274,7 @@
 					t=t.substring(0,t.length-1);
 					$("#path").html(t.substring(0,1+t.lastIndexOf("/")));
 				}
+				updateCircleColors();
 			}
 			function clearCategories() {
 				dirLevels[dirLevels.length]=$("#categories").html();
@@ -573,11 +574,12 @@
 				    .attr("text-anchor", "middle")
 					.attr("style","pointer-events: none;")
 				    .text(function(d) { return d.name; });
-				//have colors change when stuff is completed or not
+				updateCircleColors();
+			}
+			function updateCircleColors() {
 				var circleArray = $("#graph svg g circle");
 				for(var i=1;i<circleArray.length;i++) {
 					var id=circleArray[i].id;
-					console.log(id);
 					userfb.child("completed").child(id).once("value", function(data) {
 						if(data.val()==null) {
 							$("#graph svg g #"+data.name()).css("fill","#DD0000");
