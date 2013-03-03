@@ -16,10 +16,10 @@ function removeConnection(tree,parent,child) {
 	updateNodeLevel(tree,child);
 }
 function addLink(node,url) {
-	return fb.child("node").child(node).child("links").child(url).set({down: 0, up: 0}).name();
+	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0});
 }
 function removeLink(node,url) {
-	fb.child("node").child(node).child("links").child(url).set(null);
+	fb.child("node").child(node).child("links").child(window.btoa(url)).set(null);
 }
 function addDownVote(node,link) {
 	fb.child("node").child(node).child("links").child(link).child("down").once("value", function(dataSnapshot) {
