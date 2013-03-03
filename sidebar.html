@@ -149,6 +149,14 @@
 				possibleGoals=[];
 			}
 			function getPathUp(treeid,id) {
+				//clean up old stuff
+				$("#back").text("");
+				$("#back").removeClass("btn");
+				$("#back").removeClass("btn-danger");
+				$("#path").html("/");
+				$("#categories").html(dirLevels[0]);
+				dirLevels=[];
+				oldTrees=[];
 				//find which category the treeid belongs to
 				var category="";
 				fb.child("user").child(userid).child("categories").once("value", function(data) {
@@ -165,9 +173,6 @@
 						}
 					});
 				});
-				//find all the parents of the treeid in that tree
-				//find all the parents of the id in the treeid tree
-				//build that tree
 			}
 			function findAllTreeParents(category,treeid,id) {
 				var nodes=[];
@@ -216,11 +221,16 @@
 				if(dirLevels.length<=howFarIn) {
 					inTutorials=false;
 				}
+				if(dirLevels.length>1) {
+					$("#graph").html(oldTrees[oldTrees.length-1]);
+					oldTrees.splice(oldTrees.length-1, 1);
+				} else {
+					oldTrees=[];
+					$("#graph").html("");
+				}
 				if(dirLevels.length>0) {
 					$("#categories").html(dirLevels[dirLevels.length-1]);
 					dirLevels.splice(dirLevels.length-1, 1);
-					$("#graph").html(oldTrees[oldTrees.length-1]);
-					oldTrees.splice(oldTrees.length-1, 1);
 					var t=$("#path").html();
 					t=t.substring(0,t.length-1);
 					$("#path").html(t.substring(0,1+t.lastIndexOf("/")));
