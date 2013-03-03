@@ -98,6 +98,14 @@
 						});
 					});
 				});
+				fb.child("tree").child(id).child("levels").once("value", function(dtop) {
+					dtop.forEach(function(data) {
+						fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
+							addToCategoryList(data.name(),data2.val());
+							$("#"+data.name()).attr("onclick","switchToSubCategory('"+id+"','"+data.name()+"');");
+						});
+					});
+				});
 			}
 			function switchToSubCategory(treeid,id) {
 				addToPath(id);
@@ -145,6 +153,51 @@
 							});
 						});
 					}
+				});
+			}
+			function getTreeData(treeid,type,callback) {
+				var levels=[];
+				var nodes=[];
+				var nodeCount=0;
+				fb.child("tree").child(treeid).once("value",function(top) {
+					var topNode=new Object();
+					topNode.name=top.child("name").val();
+					topNode.children=[];
+					levels[0]=[];
+					levels[0].push(topNode);
+					dtop=top.child("nodes");
+					var count = 0;
+					for(var prop in dtop.val()) {
+						if(dtop.val().hasOwnProperty(prop))
+							++count;
+					}
+					dtop.forEach(function(data) {
+						fb.child(type).child(data.name()).child("name").once("value",function(name) {
+							var currdata=data.val();
+							currdata.name=name.val();
+							var childarray=[];
+							var parentarray=[];
+							data.child("children").forEach(function(child) {
+								childarray.push(child.name());
+							});
+							data.child("parents").forEach(function(parent) {
+								parentarray.push(parent.name());
+							});
+							currdata.children=childarray;
+							currdata.parents=parentarray;
+							if(currdata.level==0) {
+								levels[0][0].children.push(data.name());
+							}
+							currdata.level++;
+							levels[currdata.level] = ( typeof levels[currdata.level] != 'undefined' && levels[currdata.level] instanceof Array ) ? levels[currdata.level] : []
+							levels[currdata.level].push(data.name());
+							nodes[data.name()]=currdata;
+							nodeCount++;
+							if(nodeCount==count) {
+								callback(nodes,levels);
+							}
+						});
+					});
 				});
 			}
 		</script>
