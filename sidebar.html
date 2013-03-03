@@ -69,6 +69,7 @@
 			var listNames=[];
 			var possibleGoals=[];
 			var listGoals=[];
+			var searched=false;
 			fb.once("value", function(data) {
 				data.child("tree").forEach(function(t) {
 					var tree=new Object();
@@ -84,6 +85,7 @@
 					return listNames;
 				},
 				updater: function (item) {
+					searched=true;
 					var newCategory=names[item];
 					backToBeginning();
 					fb.child("tree").once("value", function(data) {
@@ -331,7 +333,11 @@
 				$("#categories").html(dirLevels[0]);
 				dirLevels=[];
 				oldTrees=[];
-				getMainGraph();
+				if(searched) {
+					searched=!searched;
+				} else {
+					getMainGraph();
+				}
 			}
 			function getPathUp(treeid,id) {
 				backToBeginning();
@@ -433,12 +439,14 @@
 				$("#back").addClass("btn");
 				$("#back").addClass("btn-danger");
 			}
-			function addToPath(id) {
-				$("#path").html($("#path").html()+$("#"+id+" div").text()+"/");
+			function addToPath(id,type) {
+				fb.child(type).child(id).child("name").once("value", function(data) {
+					$("#path").html($("#path").html()+data.val()+"/");
+				});
 			}
 			function switchToSubInDir(id,child,callback) {
 				currCategoryTree=id;
-				addToPath(id);
+				addToPath(id,"tree");
 				clearCategories();
 				getTreeData(id,"tree",drawTree);
 				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
@@ -458,7 +466,7 @@
 			}
 			function switchToTopDir(id) {
 				currCategoryTree=id;
-				addToPath(id);
+				addToPath(id,"tree");
 				clearCategories();
 				getTreeData(id,"tree",drawTree);
 				fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
@@ -471,7 +479,7 @@
 				});
 			}
 			function switchToSubCategory(treeid,id) {
-				addToPath(id);
+				addToPath(id,"tree");
 				clearCategories();
 				//check if it is a leaf
 				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
@@ -506,7 +514,7 @@
 				});
 			}
 			function switchToSubTutorialTree(treeid,id) {
-				addToPath(id);
+				addToPath(id,"node");
 				clearCategories();
 				fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
 					var count=0;
@@ -540,6 +548,9 @@
 					for(var prop in dtop.val()) {
 						if(dtop.val().hasOwnProperty(prop))
 							++count;
+					}
+					if(count==0) {
+						callback(nodes,levels);
 					}
 					dtop.forEach(function(data) {
 						fb.child(type).child(data.name()).child("name").once("value",function(name) {
