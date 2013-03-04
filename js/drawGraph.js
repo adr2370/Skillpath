@@ -60,7 +60,11 @@ function drawGraph(ingraph){
     .data(graph.nodes)
     .enter().append("g");
   node.append("circle")
-    .attr("r",5)
+    .attr("r",function(d){
+      if(d.r==null){
+        d.r=5;
+      }
+      return d.r;})
     .attr("class","node")
     .attr("x",-8)
     .attr("y",-8)
@@ -77,32 +81,33 @@ function drawGraph(ingraph){
     .duration(1000)
     .style("opacity",1);
 
-  force.on("tick", function() {
+  force.on("tick", function(e) {
+    var k = e.alpha*.5;
       if(treeMode){
         root = graph.nodes[transTable[levels[0][0]].index];
-        root.x = w/2;
-        root.y = 100;
+        root.x += (w/2-root.x)*k;
+        root.y += (100-root.y)*k;
         var inPlace=[];
         inPlace[transTable[levels[0][0]].index]=true;
         for(var i=1;i<levels.length;i++){
           for(var j=0;j<levels[i].length;j++){
             inPlace[transTable[levels[i][j]].index]=true;
             currNode = graph.nodes[transTable[levels[i][j]].index];
-            currNode.x = (j+1)*w/(levels[i].length+1);
-            currNode.y = (h)*(i+1)/(levels.length);
+            currNode.x += ((j+1)*w/(levels[i].length+1)-currNode.x)*k;
+            currNode.y += ((h)*(i)/(levels.length)-currNode.y)*k;
           }
         }
         for(var i=0;i<graph.nodes.length;i++) {
           if(inPlace[i]) {
           } else {
-            graph.nodes[i].x=w/2;
-            graph.nodes[i].y=-100;
+            graph.nodes[i].x+=(w/2-graph.nodes[i].x)*k;
+            graph.nodes[i].y+=(-500-graph.nodes[i].y)*k;
           }  
         }
       }
       else{
-        graph.nodes[0].x = w / 2;
-        graph.nodes[0].y = h / 2;
+        graph.nodes[0].x += (w / 2 - graph.nodes[0].x)*k*15;
+        graph.nodes[0].y += (h / 2 - graph.nodes[0].y)*k*15;
         for(var i=0;i<graph.nodes.length;i++) {
           if(graph.nodes[i].x>w) graph.nodes[i].x=w;
           if(graph.nodes[i].x<0) graph.nodes[i].x=0;
@@ -118,6 +123,7 @@ function drawGraph(ingraph){
       });
 }
 function treeView(nodeID){
+  console.log(graph.nodes);
   var svg = d3.select("#graph");
   var nodes = svg.selectAll(".node");
   /*
@@ -131,22 +137,23 @@ function treeView(nodeID){
       nodes.data().forEach(function(d) {
           newPosList[d.id]=[d.x,d.y]; });
     };
-  console.log(newPosList);
-  console.log(transTable);
   levels=[];
   levels[0]=[];
   levels[0].push(nodeID);
   count=0;
   for(var i=0;levels[i].length>0;i++){
-    console.log(levels);
     levels[i+1]=[];
     levels[i].forEach(function(node){
       levels[i+1] = levels[i+1].concat(transTable[node].children);});
   }
-  console.log(levels);
+  console.log(levels.length);
   force.resume();
 
   treeMode=true;
+}
+function graphView(){
+  treeMode=false;
+  force.resume();
 }
 
 
