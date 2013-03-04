@@ -117,7 +117,7 @@ function removeUser(userid) {
 	fb.child("user").child(userid).set(null);
 }
 function addUserCategory(userid,category,finalDes) {
-	fb.child("user").child(userid).child("categories").once("value", function(data) {
+	fb.child("user").child(userid).child("categories").child(category).once("value", function(data) {
 		console.log(data.val());
 		if(data.val()==null) {
 			var trees=[];
