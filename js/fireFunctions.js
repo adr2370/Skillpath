@@ -116,9 +116,8 @@ function addUser(userid,name,photo,email) {
 function removeUser(userid) {
 	fb.child("user").child(userid).set(null);
 }
-function addUserCategory(userid,category,finalDes) {
+function addUserCategory(userid,category,finalDes,found) {
 	fb.child("user").child(userid).child("categories").child(category).once("value", function(data) {
-		console.log(data.val());
 		if(data.val()==null) {
 			var trees=[];
 			var lookup=[];
@@ -148,7 +147,27 @@ function addUserCategory(userid,category,finalDes) {
 			});
 			fb.child("user").child(userid).child("categories").child(category).set(1);
 		} else {
-			treeView(finalDes);
+			fb.child("tree").child(category).once("value", function(tree) {
+				if(!found) {
+					addUserCategory(userid,finalDes,finalDes,found);
+					switchToTopDir(finalDes);
+				} else {
+					var count=0;
+					tree.child("nodes").child(finalDes).child("children").forEach(function(d){
+						count++;
+					});
+					if(count==0) {
+						fb.child("tree").child(finalDes).child("name").once("value", function(d) {
+							$("#path").html($("#path").html()+d.val()+"/");
+						});
+						switchToTutorialTree(finalDes);
+						clearCategories();
+					} else {
+						switchToSubCategory(tree.name(),finalDes);
+					}
+				}
+				treeView(finalDes);
+			});
 		}
 	});
 }

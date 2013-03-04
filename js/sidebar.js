@@ -38,22 +38,12 @@ $("#search").typeahead({
 			data.forEach(function(tree) {
 				if(tree.child("nodes").child(newCategory.id).val()!=null) {
 					found=true;
-					addUserCategory(userid,tree.name(),newCategory.id);
-					var count=0;
-					tree.child("nodes").child(newCategory.id).child("children").forEach(function(d){
-						count++;
-					});
-					if(count==0) {
-						$("#path").html($("#path").html()+newCategory.name+"/");
-						switchToTutorialTree(newCategory.id);
-						clearCategories();
-					} else {
-						switchToSubCategory(tree.name(),newCategory.id);
-					}
+					console.log(tree.name());
+					addUserCategory(userid,tree.name(),newCategory.id,found);
 				}
 			});
 			if(!found) {
-				addUserCategory(userid,newCategory.id,newCategory.id);
+				addUserCategory(userid,newCategory.id,newCategory.id,found);
 				switchToTopDir(newCategory.id);
 			}
 		});
@@ -296,7 +286,7 @@ function backToBeginning() {
 	$("#back").removeClass("btn-danger");
 	$("#path").html("/");
 	$("#back").attr("onclick","goBack();");
-	$("#categories").html(dirLevels[0]);
+	$("#categories").html("");
 	dirLevels=[];
 	oldTrees=[];
 	if(!searched) {
@@ -386,11 +376,6 @@ function goBack() {
 		$("#nodeCon").hide();
 		$("#graph").show();
 	} else {
-		if(dirLevels.length<=1) {
-			$("#back").text("");
-			$("#back").removeClass("btn");
-			$("#back").removeClass("btn-danger");
-		}
 		if(dirLevels.length<=howFarIn) {
 			inTutorials=false;
 		}
@@ -406,6 +391,19 @@ function goBack() {
 			oldTrees.splice(oldTrees.length-1, 1);
 		} else {
 			backToBeginning();
+		}
+		if(dirLevels.length<=1) {
+			$("#back").text("");
+			$("#back").removeClass("btn");
+			$("#back").removeClass("btn-danger");
+			userfb.child("categories").once("value", function(dtop) {
+				dtop.forEach(function(data) {
+					fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
+						addToCategoryList(data.name(),data2.val(),false);
+						$("#"+data.name()).attr("onclick","switchToTopDir('"+data.name()+"')");
+					});
+				});
+			});
 		}
 		updateCircleColors();
 	}

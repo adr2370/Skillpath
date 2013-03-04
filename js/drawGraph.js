@@ -20,6 +20,7 @@ function drawGraph(ingraph){
       }
       d.target+=graph.nodes.length-1;
     });
+    ingraph.links = ingraph.links.splice(0,ingraph.links.length-1);
     graph.nodes[0].children.push(ingraph.nodes[0].id);
     graph.nodes = graph.nodes.concat(ingraph.nodes);
     graph.links = graph.links.concat(ingraph.links);
@@ -217,7 +218,7 @@ function graphView(){
   firstTick=true;
   force.linkStrength(1).resume();
 }
-var color="#000000";
+var color="#1F77B4";
 function highlightNodes(nodes) {
 	for(var i=0;i<nodes.length;i++) {
 		var selectedNode = svg.select("."+nodes[i]);

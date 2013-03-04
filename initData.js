@@ -141,7 +141,6 @@ addNodeToTree(p3,html3);
 addNodeToTree(p3,html4);
 addNodeToTree(p3,html5);
 //css tree
-var css1=addNode("Basics");
 var css2=addNode("Cascading and inheritance");
 var css3=addNode("Selectors");
 var css4=addNode("Text Styles");
@@ -149,7 +148,6 @@ var css5=addNode("Color");
 var css6=addNode("Boxes");
 var css7=addNode("Layout");
 var css8=addNode("Media");
-addNodeToTree(p5,css1);
 addNodeToTree(p5,css2);
 addNodeToTree(p5,css3);
 addNodeToTree(p5,css4);
@@ -223,37 +221,21 @@ addNodeToTree(s1,s23);
 addNodeToTree(s1,s24);
 
 // Bat-and-ball
-addNodeToTree(s4,s5);
-addNodeToTree(s4,s6);
 addConnection(s1,s4,s5);
 addConnection(s1,s4,s6);
 
 // Combat
-addNodeToTree(s9,s10);
-addNodeToTree(s9,s12);
-addNodeToTree(s9,s13);
-addNodeToTree(s9,s14);
 addConnection(s1,s9,s10);
 addConnection(s1,s9,s12);
 addConnection(s1,s9,s13);
 addConnection(s1,s9,s14);
 
 // Dance
-addNodeToTree(s19,s20);
-addNodeToTree(s19,s21);
-addNodeToTree(s19,s22);
-addNodeToTree(s19,s23);
-addNodeToTree(s19,s24);
 addConnection(s1,s19,s20);
 addConnection(s1,s19,s21);
 addConnection(s1,s19,s22);
 addConnection(s1,s19,s23);
 addConnection(s1,s19,s24);
-
-
-// Hiphop
-
-
 
 //Breakdancing tree
 var breakdancing1=addNode("Toprock");
@@ -288,45 +270,28 @@ addNodeToTree(s23,breakdancing14);
 addNodeToTree(s23,breakdancing15);
 
 //Toprock
-addNodeToTree(breakdancing1,breakdancing2);
-addNodeToTree(breakdancing1,breakdancing3);
-addNodeToTree(breakdancing1,breakdancing4);
-// addConnection(s23,breakdancing1,breakdancing2);
-// addConnection(s23,breakdancing1,breakdancing3);
-// addConnection(s23,breakdancing1,breakdancing4);
+addConnection(s23,breakdancing1,breakdancing2);
+addConnection(s23,breakdancing1,breakdancing3);
+addConnection(s23,breakdancing1,breakdancing4);
 
 //6-step
-addNodeToTree(breakdancing5,breakdancing6);
-addNodeToTree(breakdancing5,breakdancing7);
-addNodeToTree(breakdancing5,breakdancing8);
-addNodeToTree(breakdancing5,breakdancing9);
-addNodeToTree(breakdancing5,breakdancing11);
-addNodeToTree(breakdancing5,breakdancing12);
-// addConnection(s23,breakdancing5,breakdancing6);
-// addConnection(s23,breakdancing5,breakdancing7);
-// addConnection(s23,breakdancing5,breakdancing8);
-// addConnection(s23,breakdancing5,breakdancing9);
-// addConnection(s23,breakdancing5,breakdancing11);
-// addConnection(s23,breakdancing5,breakdancing12);
+addConnection(s23,breakdancing5,breakdancing6);
+addConnection(s23,breakdancing5,breakdancing7);
+addConnection(s23,breakdancing5,breakdancing8);
+addConnection(s23,breakdancing5,breakdancing9);
+addConnection(s23,breakdancing5,breakdancing11);
+addConnection(s23,breakdancing5,breakdancing12);
 
 // Windmill: Need Flare, Backspins
-addNodeToTree(breakdancing6,breakdancing10);
-addNodeToTree(breakdancing7,breakdancing10);
-addConnection(breakdancing5,breakdancing6,breakdancing10);
-addConnection(breakdancing5,breakdancing7,breakdancing10);
+addConnection(s23,breakdancing6,breakdancing10);
+addConnection(s23,breakdancing7,breakdancing10);
 
 // Suicide: Need Jackhammer, Freeze
-addNodeToTree(breakdancing11,breakdancing14);
-addNodeToTree(breakdancing13,breakdancing14);
-addConnection(breakdancing5,breakdancing11,breakdancing14);
-// addConnection(s23,breakdancing13,breakdancing14);
+addConnection(s23,breakdancing11,breakdancing14);
+addConnection(s23,breakdancing13,breakdancing14);
 
 // Headspins: Need Turtles, Airtracks, Jackhammer, 2000s
-addNodeToTree(breakdancing8,breakdancing15);
-addNodeToTree(breakdancing9,breakdancing15);
-addNodeToTree(breakdancing11,breakdancing15);
-addNodeToTree(breakdancing12,breakdancing15);
-addConnection(breakdancing5,breakdancing8,breakdancing15);
-addConnection(breakdancing5,breakdancing9,breakdancing15);
-addConnection(breakdancing5,breakdancing11,breakdancing15);
-addConnection(breakdancing5,breakdancing12,breakdancing15);
+addConnection(s23,breakdancing8,breakdancing15);
+addConnection(s23,breakdancing9,breakdancing15);
+addConnection(s23,breakdancing11,breakdancing15);
+addConnection(s23,breakdancing12,breakdancing15);
