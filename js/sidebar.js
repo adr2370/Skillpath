@@ -12,6 +12,7 @@ var possibleGoals=[];
 var listGoals=[];
 var searched=false;
 var currNode="";
+var highlightedNodes=[];
 fb.child("tree").once("value", function(data) {
 	data.forEach(function(t) {
 		var tree=new Object();
@@ -381,6 +382,7 @@ function addToCategoryList(id,name,checkbox) {
 	}
 }
 function goBack() {
+	unHighlightNodes(highlightedNodes);
 	if($("#nodeCon").is(":visible")) {
 		$("#nodeCon").hide();
 		$("#graph").show();
@@ -410,6 +412,7 @@ function goBack() {
 	}
 }
 function clearCategories() {
+	unHighlightNodes(highlightedNodes);
 	$("#nodeCon").hide();
 	$("#graph").show();
 	dirLevels[dirLevels.length]=$("#categories").html();
@@ -635,7 +638,9 @@ function getGoalTreeData(treeid,checkNodes,callback) {
 												nodeArray.push(key);
 											}
 											//nodeArray has all nodes in path
+											unHighlightNodes(highlightedNodes);
 											highlightNodes(nodeArray);
+											highlightedNodes=nodeArray;
 										}
 									});
 								}

@@ -188,11 +188,20 @@ function graphView(){
   treeMode=false;
   force.linkStrength(1).resume();
 }
+var color="#000000";
 function highlightNodes(nodes) {
 	for(var i=0;i<nodes.length;i++) {
 		var selectedNode = svg.select("."+nodes[i]);
-		selectedNode[0][0]["style"]["fill"]="#000000";
+		selectedNode[0][0]["style"]["background"]=selectedNode[0][0]["style"]["fill"];
+		selectedNode[0][0]["style"]["fill"]=color;
 	}
 }
-
+function unHighlightNodes(nodes) {
+	for(var i=0;i<nodes.length;i++) {
+		var selectedNode = svg.select("."+nodes[i]);
+		if(selectedNode[0][0]["style"]["fill"]==color) {
+			selectedNode[0][0]["style"]["fill"]=selectedNode[0][0]["style"]["background"];
+		}
+	}
+}
 
