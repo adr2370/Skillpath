@@ -289,10 +289,7 @@ function backToBeginning() {
 function getPathUp(treeid,id) {
 	searched=true;
 	backToBeginning();
-	$("#back").text("Go Back");
-	$("#back").addClass("btn");
-	$("#back").addClass("btn-danger");
-	$("#back").attr("onclick","backToBeginning();");
+	changePathDir(treeid,id);
 	//find which category the treeid belongs to
 	var category="";
 	fb.child("user").child(userid).child("categories").once("value", function(data) {
@@ -308,6 +305,14 @@ function getPathUp(treeid,id) {
 				});
 			}
 		});
+	});
+}
+function changePathDir(treeid,id) {
+	addToPath(id,"node");
+	clearCategories();
+	fb.child("node").child(id).child("name").once("value", function(data) {
+		addToCategoryList(id,data.val(),true);
+		$("#"+id+" label input").attr("onclick","toggleCheck('"+id+"')");
 	});
 }
 function findAllTreeParents(category,treeid,id) {
@@ -358,7 +363,6 @@ function addToCategoryList(id,name,checkbox) {
 	}
 }
 function goBack() {
-	console.log("HERE");
 	if(dirLevels.length<=1) {
 		$("#back").text("");
 		$("#back").removeClass("btn");
