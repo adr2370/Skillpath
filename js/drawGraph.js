@@ -7,18 +7,37 @@ var h,link,node,levels,svg;
 var firstTick=true;
 
 function drawGraph(ingraph){
-  graph=ingraph;
+  newGraph = graph == null;
+  console.log("newGraph: "+newGraph);
+  console.log(graph);
+  console.log(ingraph);
+  if(newGraph){
+    graph=ingraph;
+  }
+  else{
+    ingraph.nodes = ingraph.nodes.splice(1,ingraph.nodes.length);
+    ingraph.links.push({"source":0,"target":graph.nodes.length,"value":10});
+    ingraph.links.forEach(function(d){
+      if(d.source!=0){
+        d.source+=graph.nodes.length-1;
+      }
+      d.target+=graph.nodes.length-1;
+    });
+    graph.nodes[0].children.push(ingraph.nodes[0].id);
+    graph.nodes = graph.nodes.concat(ingraph.nodes);
+    graph.links = graph.links.concat(ingraph.links);
+    console.log(graph);
+  }
   w = window.innerWidth-250;
   h = window.innerHeight-10;
-	var r = 720,
-	    x = d3.scale.linear().range([0, r]),
-	    y = d3.scale.linear().range([0, r]);
 	
-		$("#graph").html();
-	svg = d3.select("#graph").append("svg")
-	.attr("width", w)
-	.attr("height", h)
-	.attr("pointer-events","all");
+		$("#graph").html("");
+//  if(newGraph){
+    svg = d3.select("#graph").append("svg")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("pointer-events","all");
+//  }
 
 	/*svg.append("svg:rect")
 	.attr("width",w)
@@ -35,21 +54,29 @@ function drawGraph(ingraph){
 
   var color = d3.scale.category20();
 
-  force = d3.layout.force()
-    .linkDistance(50)
-    .friction(0.2)
-    .gravity(0.3)
-    .size([width, height]);
+//  if(newGraph){
+    force = d3.layout.force()
+      .linkDistance(50)
+      .friction(0.2)
+      .gravity(0.3)
+      .size([width, height]);
 
+//  }
   repulsion = -2700*Math.sqrt(graph.nodes.length);
   force
     .charge(repulsion)
     .nodes(graph.nodes)
     .links(graph.links)
     .start();
-
+//  addNodes = ingraph.nodes;
+//  addLinks = ingraph.links;
+//  if(newGraph){
+    addNodes=graph.nodes;
+    addLinks=graph.links;
+//  }
+    
   link = svg.selectAll(".link")
-    .data(graph.links)
+    .data(addLinks)
     .enter().append("line")
     .attr("class", "link")
     .style("stroke-width", function(d) { return Math.sqrt(d.value); })
@@ -59,7 +86,7 @@ function drawGraph(ingraph){
     .attr("y2", function(d) { transTable[d.source.id]=d.source; transTable[d.target.id]=d.target; return d.target.y; });
 
   node = svg.selectAll(".node")
-    .data(graph.nodes)
+    .data(addNodes)
     .enter().append("g");
   node.append("circle")	
     .attr("r",function(d){return 30-3*d.level})
@@ -84,8 +111,9 @@ function drawGraph(ingraph){
     var k = e.alpha*.5;
       if(treeMode){
         root = graph.nodes[transTable[levels[0][0]].index];
-        root.x += (w/2-root.x)*k;
-        root.y += (100-root.y)*k;
+        //root = [transTable[levels[0][0]]];
+        root.x += (w/2-root.x)*5*k;
+        root.y += (0-root.y)*5*k;
         var inPlace=[];
         inPlace[transTable[levels[0][0]].index]=true;
         for(var i=1;i<levels.length;i++){
@@ -93,20 +121,20 @@ function drawGraph(ingraph){
             inPlace[transTable[levels[i][j]].index]=true;
             currNode = graph.nodes[transTable[levels[i][j]].index];
             currNode.x += ((j+1)*w/(levels[i].length+1)-currNode.x)*2*k;
-            currNode.y += ((1.25*h)*(i)/(levels.length)-100-currNode.y)*2*k;
+            currNode.y += ((1.5*h)*(i)/(Math.min(5,levels.length))-100-currNode.y)*2*k;
           }
         }
         for(var i=0;i<graph.nodes.length;i++) {
           if(inPlace[i]) {
           } else {
-            graph.nodes[i].x+=(w/2-graph.nodes[i].x)*k;
-            graph.nodes[i].y+=(-800-graph.nodes[i].y)*k;
+            graph.nodes[i].x+=(w/2-graph.nodes[i].x)*5*k;
+            graph.nodes[i].y+=(-800-graph.nodes[i].y)*5*k;
           }  
         }
       }
       else{
-        graph.nodes[0].x += (w / 2 - graph.nodes[0].x)*k;
-        graph.nodes[0].y += (h / 2 - graph.nodes[0].y)*k;
+        graph.nodes[0].x += (w / 2 - graph.nodes[0].x)*5*k;
+        graph.nodes[0].y += (h / 2 - graph.nodes[0].y)*5*k;
         if(firstTick) {
 			for(var i=0;i<graph.nodes.length;i++) {
 	          if(graph.nodes[i].x>w) graph.nodes[i].x=w;
@@ -159,19 +187,19 @@ function drawGraph(ingraph){
 		}
 }
 function treeView(nodeID){
+  /*
   var svg = d3.select("#graph");
   var nodes = svg.selectAll(".node");
-  /*
   var selectedNode = svg.select("#"+nodeName);
   var xoffset = selectedNode[0][0]["parentNode"]["__data__"].x,
       yoffset = selectedNode[0][0]["parentNode"]["__data__"].y;
       nodeID= selectedNode[0][0]["parentNode"]["__data__"].id;
-      */
     if(svg.select(".posList")[0][0]==null){
       var newPosList = {};
       nodes.data().forEach(function(d) {
           newPosList[d.id]=[d.x,d.y]; });
     };
+      */
   levels=[];
   levels[0]=[];
   levels[0].push(nodeID);
@@ -184,12 +212,14 @@ function treeView(nodeID){
 	}
 	});
   }
-  force.linkStrength(0.5).resume();
+  console.log(levels);
+  force.linkStrength(0.2).resume();
   treeMode=true;
   updateCircleColors();
 }
 function graphView(){
   treeMode=false;
+  firstTick=true;
   force.linkStrength(1).resume();
 }
 var color="#000000";
