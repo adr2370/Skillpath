@@ -11,6 +11,7 @@ var listNames=[];
 var possibleGoals=[];
 var listGoals=[];
 var searched=false;
+var currNode="";
 fb.once("value", function(data) {
 	data.child("tree").forEach(function(t) {
 		var tree=new Object();
@@ -287,7 +288,6 @@ function hideAddingGoal() {
 	possibleGoals=[];
 }
 function backToBeginning() {
-	$("#graph").html("");
 	$("#back").text("");
 	$("#back").removeClass("btn");
 	$("#back").removeClass("btn-danger");
@@ -299,7 +299,7 @@ function backToBeginning() {
 	if(searched) {
 		searched=!searched;
 	} else {
-		getMainGraph();
+		graphView();
 	}
 }
 function getPathUp(treeid,id) {
@@ -392,20 +392,18 @@ function goBack() {
 		if(dirLevels.length<=howFarIn) {
 			inTutorials=false;
 		}
-		if(dirLevels.length>1) {
-			$("#graph").html(oldTrees[oldTrees.length-1]);
-			oldTrees.splice(oldTrees.length-1, 1);
-		} else {
-			oldTrees=[];
-			$("#graph").html("");
-			getMainGraph();
-		}
 		if(dirLevels.length>0) {
 			$("#categories").html(dirLevels[dirLevels.length-1]);
 			dirLevels.splice(dirLevels.length-1, 1);
 			var t=$("#path").html();
 			t=t.substring(0,t.length-1);
 			$("#path").html(t.substring(0,1+t.lastIndexOf("/")));
+		}
+		if(oldTrees.length>1&&$("#path").html()!="/") {
+			getTreeData(oldTrees[oldTrees.length-2],"prev","");
+			oldTrees.splice(oldTrees.length-1, 1);
+		} else {
+			backToBeginning();
 		}
 		updateCircleColors();
 	}
@@ -414,7 +412,6 @@ function clearCategories() {
 	$("#nodeCon").hide();
 	$("#graph").show();
 	dirLevels[dirLevels.length]=$("#categories").html();
-	oldTrees[oldTrees.length]=$("#graph").html();
 	$("#categories").html("");
 	$("#back").text("Go Back");
 	$("#back").addClass("btn");
@@ -429,7 +426,7 @@ function switchToSubInDir(id,child,callback) {
 	currCategoryTree=id;
 	addToPath(id,"tree");
 	clearCategories();
-	getTreeData(id,"tree",drawTree);
+	getTreeData(id,"next",drawTree);
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		var count=0;
 		dtop.forEach(function(data) {
@@ -449,7 +446,7 @@ function switchToTopDir(id) {
 	currCategoryTree=id;
 	addToPath(id,"tree");
 	clearCategories();
-	getTreeData(id,"tree",drawTree);
+	getTreeData(id,"next",drawTree);
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		dtop.forEach(function(data) {
 			fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
@@ -470,6 +467,7 @@ function switchToSubCategory(treeid,id) {
 			//switch to tutorial tree
 			switchToTutorialTree(id);
 		} else {
+			getTreeData(id,"next",drawTree);
 			dtop.forEach(function(data) {
 				fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
 					addToCategoryList(data.name(),data2.val(),false);
@@ -483,7 +481,7 @@ function switchToTutorialTree(id) {
 	currTutorialTree=id;
 	inTutorials=true;
 	howFarIn=dirLevels.length;
-	getTreeData(id,"node",drawTree);
+	getTreeData(id,"next",drawTree);
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		dtop.forEach(function(data) {
 			fb.child("node").child(data.name()).child("name").once("value", function(data2) {
@@ -497,6 +495,7 @@ function switchToTutorialTree(id) {
 function switchToSubTutorialTree(treeid,id) {
 	addToPath(id,"node");
 	clearCategories();
+	getTreeData(id,"next",drawTree);
 	fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
 		var count=0;
 		dtop.forEach(function() {count++;}); //count the children
@@ -515,7 +514,12 @@ function switchToSubTutorialTree(treeid,id) {
 	});
 }
 function getTreeData(treeid,type,callback) {
-	var levels=[];
+	currNode=treeid;
+	if(type=="next") {
+		oldTrees[oldTrees.length]=currNode;
+	}
+	treeView(treeid);
+	/*var levels=[];
 	var nodes=[];
 	var nodeCount=0;
 	fb.child("tree").child(treeid).once("value",function(top) {
@@ -562,6 +566,7 @@ function getTreeData(treeid,type,callback) {
 			});
 		});
 	});
+	*/
 }
 function getGoalTreeData(treeid,checkNodes,callback) {
 	var levels=[];
@@ -723,17 +728,22 @@ function updateCircleColors() {
 		if(data.val()==null) return;
 		var circleArray = $("#graph svg g circle");
 		for(var i=1;i<circleArray.length;i++) {
-			var id=circleArray[i].id;
-			if(data.child(id).val()==null) {
-				$("#graph svg g #"+data.name()).css("fill","#DD0000");
-			} else {
-				$("#graph svg g #"+data.name()).css("fill","#00DD00");
-			}
-			userfb.child("completed").child(id).on("value", function(data) {
-				if(data.val()==null) {
-					$("#graph svg g #"+data.name()).css("fill","#DD0000");
-				} else {
-					$("#graph svg g #"+data.name()).css("fill","#00DD00");
+			var id2=circleArray[i].className.baseVal;
+			fb.child("node").child(id2).once("value",function(d) {
+				if(d.val()!=null) {
+					var id=d.name();
+					if(data.child(id).val()==null) {
+						$("#graph svg g circle."+id).css("fill","#DD0000");
+					} else {
+						$("#graph svg g circle."+id).css("fill","#00DD00");
+					}
+					userfb.child("completed").child(id).on("value", function(data) {
+						if(data.val()==null) {
+							$("#graph svg g circle."+data.name()).css("fill","#DD0000");
+						} else {
+							$("#graph svg g circle."+data.name()).css("fill","#00DD00");
+						}
+					});
 				}
 			});
 		}
