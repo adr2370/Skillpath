@@ -95,10 +95,24 @@
 		</style>
 	</head>
 	<body>
+		<!-- Modal -->
+		<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		    <h3 id="myModalLabel">Add a new link</h3>
+		  </div>
+		  <div class="modal-body">
+    		<input id="inputLink" type="text" class="span6" placeholder="Text input">
+		  </div>
+		  <div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		    <button id="saveLink" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
 		<div id="nodeCon" style="display:none;">
 			<div id="nodeContainer" class="nodeHeader">
 				<h1 style="float:left;"></h1>
-				<span class="addSkill"><img src="img/addLink.png" alt=""></span>
+				<a href="#myModal" data-toggle="modal"><span class="addSkill"><img src="img/addLink.png" alt=""></span></a>
 			</div>
 			<div id="urlContainer" class="linkContainer"></div>
 		</div>

@@ -46,4 +46,10 @@ function goToTheNodePage(nodeId) {
 		var nodeLink = $(this).data('nodelink');
 		addDownVote(nodeId,nodeLink,userid);
 	});
+
+	$('#saveLink').click(function() {
+		var url = $('#inputLink').val();
+		addLink(nodeId,url);
+		$('#myModal').modal('toggle');
+	});
 }
