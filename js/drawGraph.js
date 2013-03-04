@@ -8,9 +8,6 @@ var firstTick=true;
 
 function drawGraph(ingraph){
   newGraph = graph == null;
-  console.log("newGraph: "+newGraph);
-  console.log(graph);
-  console.log(ingraph);
   if(newGraph){
     graph=ingraph;
   }
@@ -26,7 +23,6 @@ function drawGraph(ingraph){
     graph.nodes[0].children.push(ingraph.nodes[0].id);
     graph.nodes = graph.nodes.concat(ingraph.nodes);
     graph.links = graph.links.concat(ingraph.links);
-    console.log(graph);
   }
   w = window.innerWidth-250;
   h = window.innerHeight-10;
@@ -212,7 +208,6 @@ function treeView(nodeID){
 	}
 	});
   }
-  console.log(levels);
   force.linkStrength(0.2).resume();
   treeMode=true;
   updateCircleColors();

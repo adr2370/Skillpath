@@ -11,6 +11,7 @@ var listNames=[];
 var possibleGoals=[];
 var listGoals=[];
 var searched=false;
+var searchedid="";
 var currNode="";
 var highlightedNodes=[];
 fb.child("tree").once("value", function(data) {
@@ -29,6 +30,7 @@ $("#search").typeahead({
 	},
 	updater: function (item) {
 		searched=true;
+		searchedid=item;
 		var newCategory=names[item];
 		backToBeginning();
 		fb.child("tree").once("value", function(data) {
@@ -36,7 +38,7 @@ $("#search").typeahead({
 			data.forEach(function(tree) {
 				if(tree.child("nodes").child(newCategory.id).val()!=null) {
 					found=true;
-					addUserCategory(userid,tree.name());
+					addUserCategory(userid,tree.name(),newCategory.id);
 					var count=0;
 					tree.child("nodes").child(newCategory.id).child("children").forEach(function(d){
 						count++;
@@ -51,7 +53,7 @@ $("#search").typeahead({
 				}
 			});
 			if(!found) {
-				addUserCategory(userid,newCategory.id);
+				addUserCategory(userid,newCategory.id,newCategory.id);
 				switchToTopDir(newCategory.id);
 			}
 		});
@@ -297,9 +299,7 @@ function backToBeginning() {
 	$("#categories").html(dirLevels[0]);
 	dirLevels=[];
 	oldTrees=[];
-	if(searched) {
-		searched=!searched;
-	} else {
+	if(!searched) {
 		graphView();
 	}
 }
@@ -421,6 +421,9 @@ function clearCategories() {
 	$("#back").text("Go Back");
 	$("#back").addClass("btn");
 	$("#back").addClass("btn-danger");
+	if(searched) {
+		searched=false;
+	}
 }
 function addToPath(id,type) {
 	fb.child(type).child(id).child("name").once("value", function(data) {
@@ -489,7 +492,6 @@ function switchToSubCategory(treeid,id) {
 	});
 }
 function switchToTutorialTree(id) {
-	console.log(id);
 	currTutorialTree=id;
 	inTutorials=true;
 	howFarIn=dirLevels.length;
@@ -531,7 +533,9 @@ function getTreeData(treeid,type,callback) {
 	if(type=="next"&&oldTrees[oldTrees.length-1]!=currNode) {
 		oldTrees[oldTrees.length]=currNode;
 	}
-	treeView(treeid);
+	if(!searched) {
+		treeView(treeid);
+	}
 	/*var levels=[];
 	var nodes=[];
 	var nodeCount=0;

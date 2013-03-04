@@ -116,34 +116,41 @@ function addUser(userid,name,photo,email) {
 function removeUser(userid) {
 	fb.child("user").child(userid).set(null);
 }
-function addUserCategory(userid,category) {
-	var trees=[];
-	var lookup=[];
-	trees[0]={name:"me", id:0, index:0, color:0, level:0, children:[]};
-	lookup[0]=0;
-	var edges=[];
-	var count=$("#graph svg g").length;
-	var overallCount=0;
-	var tree=category;
-	fb.child("tree").child(tree).child("name").once("value", function(d) {
-		var t=new Object();
-		t.id=tree;
-		t.name=d.val();
-		overallCount++;
-		t.color=overallCount;
-		t.index=trees.length;
-		t.children=[];
-		lookup[t.id]=t.index;
-		t.level=1;
-		trees[0].children.push(t.id);
-		trees.push(t);
-		edges.push({source:0,target:trees.length-1,value:10});
-		count--;
-		if(count==0) {
-			addCategoryTrees(trees,edges,lookup);
+function addUserCategory(userid,category,finalDes) {
+	fb.child("user").child(userid).child("categories").once("value", function(data) {
+		console.log(data.val());
+		if(data.val()==null) {
+			var trees=[];
+			var lookup=[];
+			trees[0]={name:"me", id:0, index:0, color:0, level:0, children:[]};
+			lookup[0]=0;
+			var edges=[];
+			var count=1;
+			var overallCount=0;
+			var tree=category;
+			fb.child("tree").child(tree).child("name").once("value", function(d) {
+				var t=new Object();
+				t.id=tree;
+				t.name=d.val();
+				overallCount++;
+				t.color=overallCount;
+				t.index=trees.length;
+				t.children=[];
+				lookup[t.id]=t.index;
+				t.level=1;
+				trees[0].children.push(t.id);
+				trees.push(t);
+				edges.push({source:0,target:trees.length-1,value:10});
+				count--;
+				if(count==0) {
+					addCategoryTrees(trees,edges,lookup);
+				}
+			});
+			fb.child("user").child(userid).child("categories").child(category).set(1);
+		} else {
+			treeView(finalDes);
 		}
 	});
-	fb.child("user").child(userid).child("categories").child(category).set(1);
 }
 function addCompletedNode(userid,node) {
 	fb.child("user").child(userid).child("completed").child(node).set(1);
