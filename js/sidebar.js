@@ -93,7 +93,7 @@ userfb.child("goals").on("child_added", function(data) {
 function getMainGraph() {
 	var trees=[];
 	var lookup=[];
-	trees[0]={name:"me", id:0, index:0, color:0};
+	trees[0]={name:"me", id:0, index:0, color:0, level:0, children:[]};
 	lookup[0]=0;
 	var edges=[];
 	var count=0;
@@ -109,7 +109,10 @@ function getMainGraph() {
 				overallCount++;
 				t.color=overallCount;
 				t.index=trees.length;
+				t.children=[];
 				lookup[t.id]=t.index;
+				t.level=1;
+				trees[0].children.push(t.id);
 				trees.push(t);
 				edges.push({source:0,target:trees.length-1,value:10});
 				count--;
@@ -139,17 +142,23 @@ function addCategoryTrees(trees,edges,lookup) {
 				var nodeCount=0;
 				data.child("nodes").forEach(function(node) {
 					nodeCount++;
+					var n=new Object();
+					n.children=[];
+					node.child("children").forEach(function(child) {
+						n.children.push(child.name());
+					});
 					fb.child("tree").child(node.name()).child("name").once("value", function(nodeName) {
-						var n=new Object();
 						n.id=node.name();
 						n.name=nodeName.val();
 						var index=lookup[data.name()];
 						n.color=topTrees[index-1].color;
 						n.index=trees.length;
 						lookup[n.id]=n.index;
+						n.level=2+node.child("level").val();
 						trees.push(n);
 						if(node.child("level").val()==0) {
 							edges.push({source:index,target:n.index,value:5});
+							topTrees[index-1].children.push(n.id);
 						} else {
 							node.child("parents").forEach(function(parent) {
 								edges.push({source:lookup[parent.name()],target:n.index,value:3});
@@ -181,6 +190,7 @@ function addSkillTrees(trees,edges,lookup,startSpot) {
 				count--;
 			} else {
 				var nodeCount=0;
+				topTrees[lookup[data.name()]-startSpot].children=[];
 				data.child("nodes").forEach(function(node) {
 					nodeCount++;
 					fb.child("node").child(node.name()).child("name").once("value", function(nodeName) {
@@ -188,12 +198,18 @@ function addSkillTrees(trees,edges,lookup,startSpot) {
 						n.id=node.name();
 						n.name=nodeName.val();
 						var index=lookup[data.name()];
+						n.level=1+topTrees[index-startSpot].level+node.child("level").val();
 						n.color=topTrees[index-startSpot].color;
 						n.index=trees.length;
 						secondLookup[data.name()][n.id]=n.index;
+						n.children=[];
+						node.child("children").forEach(function(child) {
+							n.children.push(child.name());
+						});
 						trees.push(n);
 						if(node.child("level").val()==0) {
 							edges.push({source:index,target:n.index,value:2});
+							topTrees[lookup[data.name()]-startSpot].children.push(n.id);
 						} else {
 							node.child("parents").forEach(function(parent) {
 								edges.push({source:secondLookup[data.name()][parent.name()],target:n.index,value:1});
