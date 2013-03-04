@@ -3,7 +3,7 @@ var treeMode = false;
 var graph;
 var force;
 var w;
-var h,link,node,levels;
+var h,link,node,levels,svg;
 
 function drawGraph(ingraph){
   graph=ingraph;
@@ -14,7 +14,7 @@ function drawGraph(ingraph){
 	    y = d3.scale.linear().range([0, r]);
 	
 		$("#graph").html();
-	var svg = d3.select("#graph").append("svg")
+	svg = d3.select("#graph").append("svg")
 	.attr("width", w)
 	.attr("height", h)
 	.attr("pointer-events","all");
@@ -188,6 +188,11 @@ function graphView(){
   treeMode=false;
   force.linkStrength(1).resume();
 }
-
+function highlightNodes(nodes) {
+	for(var i=0;i<nodes.length;i++) {
+		var selectedNode = svg.select("."+nodes[i]);
+		selectedNode[0][0]["style"]["fill"]="#000000";
+	}
+}
 
 

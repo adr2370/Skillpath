@@ -630,7 +630,12 @@ function getGoalTreeData(treeid,checkNodes,callback) {
 													}
 												}
 											}
-											callback(nodes,levels);
+											var nodeArray=[];
+											for(var key in nodes) {
+												nodeArray.push(key);
+											}
+											//nodeArray has all nodes in path
+											highlightNodes(nodeArray);
 										}
 									});
 								}
