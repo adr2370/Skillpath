@@ -175,3 +175,158 @@ addNodeToTree(p4,javascript7);
 //c tree
 var c1=addNode("Assembly");
 addNodeToTree(p13,c1);
+
+//Sports tree
+var s1=addTree("Sports","tree");
+var s2=addTree("Archery","node");
+var s3=addTree("Basketball","node");
+var s4=addTree("Bat-and-ball","tree");
+var s5=addTree("Baseball","node");
+var s6=addTree("Softball","node");
+var s7=addTree("Bowling","node");
+var s8=addTree("Cycling","node");
+var s9=addTree("Combat","tree");
+var s10=addTree("Grappling","node");
+var s12=addTree("Skirmish","node");
+var s13=addTree("Weapons","node");
+var s14=addTree("Striking","node");
+var s15=addTree("Fishing","node");
+var s16=addTree("Football","node");
+var s17=addTree("Golf","node");
+var s18=addTree("Gymnastics","node");
+var s19=addTree("Dance","tree");
+var s20=addTree("Ballet","node");
+var s21=addTree("Jazz","node");
+var s22=addTree("Hip-hop","node");
+var s23=addTree("Breakdancing","node");
+var s24=addTree("Tap","node");
+addNodeToTree(s1,s2);
+addNodeToTree(s1,s3);
+addNodeToTree(s1,s4);
+addNodeToTree(s1,s5);
+addNodeToTree(s1,s6);
+addNodeToTree(s1,s8);
+addNodeToTree(s1,s9);
+addNodeToTree(s1,s10);
+addNodeToTree(s1,s12);
+addNodeToTree(s1,s13);
+addNodeToTree(s1,s14);
+addNodeToTree(s1,s15);
+addNodeToTree(s1,s16);
+addNodeToTree(s1,s17);
+addNodeToTree(s1,s18);
+addNodeToTree(s1,s19);
+addNodeToTree(s1,s20);
+addNodeToTree(s1,s21);
+addNodeToTree(s1,s22);
+addNodeToTree(s1,s23);
+addNodeToTree(s1,s24);
+
+// Bat-and-ball
+addNodeToTree(s4,s5);
+addNodeToTree(s4,s6);
+addConnection(s1,s4,s5);
+addConnection(s1,s4,s6);
+
+// Combat
+addNodeToTree(s9,s10);
+addNodeToTree(s9,s12);
+addNodeToTree(s9,s13);
+addNodeToTree(s9,s14);
+addConnection(s1,s9,s10);
+addConnection(s1,s9,s12);
+addConnection(s1,s9,s13);
+addConnection(s1,s9,s14);
+
+// Dance
+addNodeToTree(s19,s20);
+addNodeToTree(s19,s21);
+addNodeToTree(s19,s22);
+addNodeToTree(s19,s23);
+addNodeToTree(s19,s24);
+addConnection(s1,s19,s20);
+addConnection(s1,s19,s21);
+addConnection(s1,s19,s22);
+addConnection(s1,s19,s23);
+addConnection(s1,s19,s24);
+
+
+// Hiphop
+
+
+
+//Breakdancing tree
+var breakdancing1=addNode("Toprock");
+var breakdancing2=addNode("Popping");
+var breakdancing3=addNode("Locking");
+var breakdancing4=addNode("Moonwalk");
+var breakdancing5=addNode("6-step");
+var breakdancing6=addNode("Flare");
+var breakdancing7=addNode("Backspins");
+var breakdancing8=addNode("Turtles");
+var breakdancing9=addNode("Airtracks");
+var breakdancing10=addNode("Windmill");
+var breakdancing11=addNode("Jackhammer");
+var breakdancing12=addNode("2000s");
+var breakdancing13=addNode("Freeze");
+var breakdancing14=addNode("Suicides");
+var breakdancing15=addNode("Headspins");
+addNodeToTree(s23,breakdancing1);
+addNodeToTree(s23,breakdancing2);
+addNodeToTree(s23,breakdancing3);
+addNodeToTree(s23,breakdancing4);
+addNodeToTree(s23,breakdancing5);
+addNodeToTree(s23,breakdancing6);
+addNodeToTree(s23,breakdancing7);
+addNodeToTree(s23,breakdancing8);
+addNodeToTree(s23,breakdancing9);
+addNodeToTree(s23,breakdancing10);
+addNodeToTree(s23,breakdancing11);
+addNodeToTree(s23,breakdancing12);
+addNodeToTree(s23,breakdancing13);
+addNodeToTree(s23,breakdancing14);
+addNodeToTree(s23,breakdancing15);
+
+//Toprock
+addNodeToTree(breakdancing1,breakdancing2);
+addNodeToTree(breakdancing1,breakdancing3);
+addNodeToTree(breakdancing1,breakdancing4);
+// addConnection(s23,breakdancing1,breakdancing2);
+// addConnection(s23,breakdancing1,breakdancing3);
+// addConnection(s23,breakdancing1,breakdancing4);
+
+//6-step
+addNodeToTree(breakdancing5,breakdancing6);
+addNodeToTree(breakdancing5,breakdancing7);
+addNodeToTree(breakdancing5,breakdancing8);
+addNodeToTree(breakdancing5,breakdancing9);
+addNodeToTree(breakdancing5,breakdancing11);
+addNodeToTree(breakdancing5,breakdancing12);
+// addConnection(s23,breakdancing5,breakdancing6);
+// addConnection(s23,breakdancing5,breakdancing7);
+// addConnection(s23,breakdancing5,breakdancing8);
+// addConnection(s23,breakdancing5,breakdancing9);
+// addConnection(s23,breakdancing5,breakdancing11);
+// addConnection(s23,breakdancing5,breakdancing12);
+
+// Windmill: Need Flare, Backspins
+addNodeToTree(breakdancing6,breakdancing10);
+addNodeToTree(breakdancing7,breakdancing10);
+addConnection(breakdancing5,breakdancing6,breakdancing10);
+addConnection(breakdancing5,breakdancing7,breakdancing10);
+
+// Suicide: Need Jackhammer, Freeze
+addNodeToTree(breakdancing11,breakdancing14);
+addNodeToTree(breakdancing13,breakdancing14);
+addConnection(breakdancing5,breakdancing11,breakdancing14);
+// addConnection(s23,breakdancing13,breakdancing14);
+
+// Headspins: Need Turtles, Airtracks, Jackhammer, 2000s
+addNodeToTree(breakdancing8,breakdancing15);
+addNodeToTree(breakdancing9,breakdancing15);
+addNodeToTree(breakdancing11,breakdancing15);
+addNodeToTree(breakdancing12,breakdancing15);
+addConnection(breakdancing5,breakdancing8,breakdancing15);
+addConnection(breakdancing5,breakdancing9,breakdancing15);
+addConnection(breakdancing5,breakdancing11,breakdancing15);
+addConnection(breakdancing5,breakdancing12,breakdancing15);
