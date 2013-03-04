@@ -7,7 +7,6 @@ var h,link,node,levels;
 
 function drawGraph(ingraph){
   graph=ingraph;
-  console.log(graph);
   w = window.innerWidth-250;
   h = window.innerHeight-10;
 	var r = 720,
@@ -18,10 +17,10 @@ function drawGraph(ingraph){
 	.attr("height", h)
 	.attr("pointer-events","all");
 
-	svg.append("svg:rect")
+	/*svg.append("svg:rect")
 	.attr("width",w)
 	.attr("height",h)
-	.attr("fill","white");
+	.attr("fill","white");*/
 	//.style("opacity",0);
 
 	function redraw() {
@@ -59,20 +58,21 @@ function drawGraph(ingraph){
   node = svg.selectAll(".node")
     .data(graph.nodes)
     .enter().append("g");
-  node.append("circle")
-    .attr("r",5)
+  node.append("circle")	
+    .attr("r",function(d){return 30-3*d.level})
     .attr("class","node")
     .attr("x",-8)
     .attr("y",-8)
+    .attr("class",function(d){return d.id})
     .attr("id",function(d){return d.name})
     .style("fill",function(d){return color(d.color);});
   node.append("text")
     //.attr("text-anchor", "middle")
-    .attr("dx",12)
+    .attr("dx",22)
     .attr("dy",".35em")
     .text(function(d) {return d.name});
 
-  svg.style("opacity",1e-6)
+  svg.style("opacity",1)
     .transition()
     .duration(1000)
     .style("opacity",1);
@@ -116,6 +116,8 @@ function drawGraph(ingraph){
       .attr("y2", function(d) { return d.target.y; });
       node.attr("transform", function(d) {return "translate("+d.x+","+d.y+")"; });
       });
+
+	  //updateCircleColors();
 }
 function treeView(nodeID){
   var svg = d3.select("#graph");
@@ -131,22 +133,18 @@ function treeView(nodeID){
       nodes.data().forEach(function(d) {
           newPosList[d.id]=[d.x,d.y]; });
     };
-  console.log(newPosList);
-  console.log(transTable);
   levels=[];
   levels[0]=[];
   levels[0].push(nodeID);
   count=0;
   for(var i=0;levels[i].length>0;i++){
-    console.log(levels);
     levels[i+1]=[];
     levels[i].forEach(function(node){
       levels[i+1] = levels[i+1].concat(transTable[node].children);});
   }
-  console.log(levels);
   force.resume();
-
   treeMode=true;
+  updateCircleColors();
 }
 
 
