@@ -7,9 +7,48 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+    .arrows {
+    	position: relative;
+    	height:60px;
+    }
+.arrowUp {
+	background:url('img/arrow-up.png') no-repeat;
+	width: 61px;
+	padding-top:38px;
+	text-align: center
+}
+.arrowDown {
+	background:url('img/arrow-down2.png') no-repeat;
+	width: 61px;
+	height: 72px;
+	text-align: center;
+}
+.arrowDown:hover {
+	background:url('img/arrow-down-active2.png') no-repeat;
+}
+.arrowUp:hover {
+	background:url('img/arrow-up-active.png') no-repeat;
+}
+.linkListing {
+	margin-bottom: 40px;
+}
+.linkText {
+	margin-left: 70px;
+	margin-top: -36px;
+}
+.linkText h2 {
+	margin: 0;
+}
+    </style>
 </head>
 <body>
 <h1></h1>
+
+
+
+
+
 <div id="nodeContainer"></div>
 <div id="urlContainer"></div>
 <div style="position: fixed; right: 0px; top: 0px; height: 100%; width: 250px; background-color: grey;">
@@ -44,7 +83,24 @@ fb.child("node").child(nodeId).on("value", function(nodeInfo) {
 	// console.log(sortedLinks);
 	$.each( sortedLinks, function(key,value) {
 		url = window.atob(value.url); // Reverses base64
-		links.push('<p><a href="'+url+'">'+url+'</a></p><p class="upVote" data-nodelink="'+value.url+'">Up: '+value.up+'</p><p class="downVote" data-nodelink="'+value.url+'">Down: '+value.down+'</p>');
+		links.push(
+			'<div class="linkListing">'+
+				'<div class="arrows">'+
+					'<div class="arrowUp upVote" data-nodelink="'+value.url+'">'+
+						'<span class="upCount" data-nodelink="'+value.url+'">'+value.up+'</span>'+
+					'</div>'+
+					'<div class="arrowDown downVote" data-nodelink="'+value.url+'">'+
+						'<span class="downCount" data-nodelink="'+value.url+'">'+value.down+'</span>'+
+					'</div>	'+
+				'</div>'+
+				'<a href="'+url+'">'+
+				'<div class="linkText">'+
+					'<h2>'+url+'</h2>'+
+					'<em>'+url+'</em>'+
+				'</div>'+
+				'</a>'+
+			'</div>'
+		);
 	});
 	$('#urlContainer').html(links.join(''));
 });
@@ -87,6 +143,7 @@ function getUrlVars()
     }
     return vars;
 }
+
 </script>	
 </body>
 </html>
