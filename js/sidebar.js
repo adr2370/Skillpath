@@ -312,6 +312,7 @@ function changePathDir(treeid,id) {
 	clearCategories();
 	fb.child("node").child(id).child("name").once("value", function(data) {
 		addToCategoryList(id,data.val(),true);
+		$("#"+id).attr("onclick","goToTheNodePage('"+id+"');");
 		$("#"+id+" label input").attr("onclick","toggleCheck('"+id+"')");
 	});
 }
@@ -485,6 +486,7 @@ function switchToSubTutorialTree(treeid,id) {
 		dtop.forEach(function() {count++;}); //count the children
 		if(count==0) {
 			//go to the node page for this
+			goToTheNodePage(id);
 		} else {
 			dtop.forEach(function(data) {
 				fb.child("node").child(data.name()).child("name").once("value", function(data2) {
