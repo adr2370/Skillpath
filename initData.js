@@ -12,30 +12,30 @@ addConnection(music,string,cello);
 addConnection(music,string,violin);
 addConnection(music,string,bass);
 //cello tree
-var strings=addNode("strings");
-var fingering=addNode("fingering");
-var reading=addNode("reading");
-var notes=addNode("notes");
-addNodeToTree(cello,strings);
-addNodeToTree(cello,fingering);
-addNodeToTree(cello,reading);
-addNodeToTree(cello,notes);
-addConnection(cello,strings,notes);
-addConnection(cello,fingering,notes);
+var strings=[addNode("strings"),addNode("strings"),addNode("strings")];
+var fingering=[addNode("fingering"),addNode("fingering"),addNode("fingering")];
+var reading=[addNode("reading"),addNode("reading"),addNode("reading")];
+var notes=[addNode("notes"),addNode("notes"),addNode("notes")];
+addNodeToTree(cello,strings[0]);
+addNodeToTree(cello,fingering[0]);
+addNodeToTree(cello,reading[0]);
+addNodeToTree(cello,notes[0]);
+addConnection(cello,strings[0],notes[0]);
+addConnection(cello,fingering[0],notes[0]);
 //violin tree
-addNodeToTree(violin,strings);
-addNodeToTree(violin,fingering);
-addNodeToTree(violin,reading);
-addNodeToTree(violin,notes);
-addConnection(violin,strings,notes);
-addConnection(violin,fingering,notes);
+addNodeToTree(violin,strings[1]);
+addNodeToTree(violin,fingering[1]);
+addNodeToTree(violin,reading[1]);
+addNodeToTree(violin,notes[1]);
+addConnection(violin,strings[1],notes[1]);
+addConnection(violin,fingering[1],notes[1]);
 //bass tree
-addNodeToTree(bass,strings);
-addNodeToTree(bass,fingering);
-addNodeToTree(bass,reading);
-addNodeToTree(bass,notes);
-addConnection(bass,strings,notes);
-addConnection(bass,fingering,notes);
+addNodeToTree(bass,strings[2]);
+addNodeToTree(bass,fingering[2]);
+addNodeToTree(bass,reading[2]);
+addNodeToTree(bass,notes[2]);
+addConnection(bass,strings[2],notes[2]);
+addConnection(bass,fingering[2],notes[2]);
 
 //programming tree
 var a=addTree("programming","tree");
