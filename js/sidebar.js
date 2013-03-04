@@ -224,7 +224,6 @@ function addSkillTrees(trees,edges,lookup,startSpot) {
 								var dictionary=new Object();
 								dictionary.nodes=trees;
 								dictionary.links=edges;
-								console.log(dictionary);
 								drawGraph(dictionary);
 							}
 						}
