@@ -1,9 +1,16 @@
+var transTable={};
+var treeMode = false;
+var graph;
+var force;
+var w;
+var h,link,node,levels;
 
-
-function drawGraph(graph){
-	var w = window.innerWidth-250,
-	    h = window.innerHeight-10,
-	    r = 720,
+function drawGraph(ingraph){
+  graph=ingraph;
+  console.log(graph);
+  w = window.innerWidth-250;
+  h = window.innerHeight-10;
+	var r = 720,
 	    x = d3.scale.linear().range([0, r]),
 	    y = d3.scale.linear().range([0, r]);
 	var svg = d3.select("#graph").append("svg")
@@ -26,7 +33,7 @@ function drawGraph(graph){
 
   var color = d3.scale.category20();
 
-  var force = d3.layout.force()
+  force = d3.layout.force()
     .linkDistance(50)
     .friction(0.2)
     .gravity(0.3)
@@ -39,7 +46,7 @@ function drawGraph(graph){
     .links(graph.links)
     .start();
 
-  var link = svg.selectAll(".link")
+  link = svg.selectAll(".link")
     .data(graph.links)
     .enter().append("line")
     .attr("class", "link")
@@ -47,9 +54,9 @@ function drawGraph(graph){
     .attr("x1", function(d) { return d.source.x; })
     .attr("y1", function(d) { return d.source.y; })
     .attr("x2", function(d) { return d.target.x; })
-    .attr("y2", function(d) { return d.target.y; });
+    .attr("y2", function(d) { transTable[d.source.id]=d.source; transTable[d.target.id]=d.target; return d.target.y; });
 
-  var node = svg.selectAll(".node")
+  node = svg.selectAll(".node")
     .data(graph.nodes)
     .enter().append("g");
   node.append("circle")
@@ -57,6 +64,7 @@ function drawGraph(graph){
     .attr("class","node")
     .attr("x",-8)
     .attr("y",-8)
+    .attr("id",function(d){return d.name})
     .style("fill",function(d){return color(d.color);});
   node.append("text")
     //.attr("text-anchor", "middle")
@@ -70,14 +78,38 @@ function drawGraph(graph){
     .style("opacity",1);
 
   force.on("tick", function() {
-	  graph.nodes[0].x = w / 2;
-	  graph.nodes[0].y = h / 2;
-	  for(var i=0;i<graph.nodes.length;i++) {
-		if(graph.nodes[i].x>w) graph.nodes[i].x=w;
-		if(graph.nodes[i].x<0) graph.nodes[i].x=0;
-		if(graph.nodes[i].y>h) graph.nodes[i].y=h;
-		if(graph.nodes[i].y<0) graph.nodes[i].y=0;
-	}
+      if(treeMode){
+        root = graph.nodes[transTable[levels[0][0]].index];
+        root.x = w/2;
+        root.y = 100;
+        var inPlace=[];
+        inPlace[transTable[levels[0][0]].index]=true;
+        for(var i=1;i<levels.length;i++){
+          for(var j=0;j<levels[i].length;j++){
+            inPlace[transTable[levels[i][j]].index]=true;
+            currNode = graph.nodes[transTable[levels[i][j]].index];
+            currNode.x = (j+1)*w/(levels[i].length+1);
+            currNode.y = (h)*(i+1)/(levels.length);
+          }
+        }
+        for(var i=0;i<graph.nodes.length;i++) {
+          if(inPlace[i]) {
+          } else {
+            graph.nodes[i].x=w/2;
+            graph.nodes[i].y=-100;
+          }  
+        }
+      }
+      else{
+        graph.nodes[0].x = w / 2;
+        graph.nodes[0].y = h / 2;
+        for(var i=0;i<graph.nodes.length;i++) {
+          if(graph.nodes[i].x>w) graph.nodes[i].x=w;
+          if(graph.nodes[i].x<0) graph.nodes[i].x=0;
+          if(graph.nodes[i].y>h) graph.nodes[i].y=h;
+          if(graph.nodes[i].y<0) graph.nodes[i].y=0;
+        }
+      }
       link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
@@ -85,3 +117,37 @@ function drawGraph(graph){
       node.attr("transform", function(d) {return "translate("+d.x+","+d.y+")"; });
       });
 }
+function treeView(nodeID){
+  var svg = d3.select("#graph");
+  var nodes = svg.selectAll(".node");
+  /*
+  var selectedNode = svg.select("#"+nodeName);
+  var xoffset = selectedNode[0][0]["parentNode"]["__data__"].x,
+      yoffset = selectedNode[0][0]["parentNode"]["__data__"].y;
+      nodeID= selectedNode[0][0]["parentNode"]["__data__"].id;
+      */
+    if(svg.select(".posList")[0][0]==null){
+      var newPosList = {};
+      nodes.data().forEach(function(d) {
+          newPosList[d.id]=[d.x,d.y]; });
+    };
+  console.log(newPosList);
+  console.log(transTable);
+  levels=[];
+  levels[0]=[];
+  levels[0].push(nodeID);
+  count=0;
+  for(var i=0;levels[i].length>0;i++){
+    console.log(levels);
+    levels[i+1]=[];
+    levels[i].forEach(function(node){
+      levels[i+1] = levels[i+1].concat(transTable[node].children);});
+  }
+  console.log(levels);
+  force.resume();
+
+  treeMode=true;
+}
+
+
+
