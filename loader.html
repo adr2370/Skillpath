@@ -1,76 +1,22 @@
+<h1>Loader</h1>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+<script src='//cdn.firebase.com/v0/firebase.js'></script>
+<script src='//cdn.firebase.com/v0/firebase-auth-client.js'></script>
+<script src="js/fireFunctions.js"></script>
+<script>
 //music tree
-var music=addTree("Music","tree");
-var string=addTree("String","tree");
-var violin=addTree("Violin","node");
-var banjo=addTree("Banjo","node");
-var ukulele=addTree("Ukulele","node");
-var harp=addTree("Harp","node");
-var cello=addTree("Cello","node");
-var bass=addTree("Bass","node");
-var wind=addTree("Wind","tree");
-var recorder=addTree("Recorder","node");
-var flute=addTree("Flute","node");
-var accordion=addTree("Accordion","node");
-var bagpipe=addTree("Bagpipe","node");
-var brass=addTree("Brass","tree");
-var trumpet=addTree("Trumpet","node");
-var horn=addTree("Horn","node");
-var trombone=addTree("Trombone","node");
-var tuba=addTree("Tuba","node");
-var bugle=addTree("Bugle","node");
-var saxophone=addTree("Saxophone","node");
-var percussion=addTree("Percussion","tree");
-var triangle=addTree("Triangle","node");
-var cowbell=addTree("Cowbell","node");
-var xylophone=addTree("Xylophone","node");
-var bongo=addTree("Bongo","node");
-var conga=addTree("Conga","node");
+var music=addTree("music","tree");
+var string=addTree("string","tree");
+var cello=addTree("cello","node");
+var violin=addTree("violin","node");
+var bass=addTree("bass","node");
 addNodeToTree(music,string);
-addNodeToTree(music,violin);
-addNodeToTree(music,banjo);
-addNodeToTree(music,ukulele);
-addNodeToTree(music,harp);
 addNodeToTree(music,cello);
+addNodeToTree(music,violin);
 addNodeToTree(music,bass);
-addNodeToTree(music,wind);
-addNodeToTree(music,recorder);
-addNodeToTree(music,flute);
-addNodeToTree(music,accordion);
-addNodeToTree(music,bagpipe);
-addNodeToTree(music,brass);
-addNodeToTree(music,trumpet);
-addNodeToTree(music,horn);
-addNodeToTree(music,trombone);
-addNodeToTree(music,tuba);
-addNodeToTree(music,bugle);
-addNodeToTree(music,saxophone);
-addNodeToTree(music,percussion);
-addNodeToTree(music,triangle);
-addNodeToTree(music,cowbell);
-addNodeToTree(music,xylophone);
-addNodeToTree(music,bongo);
-addNodeToTree(music,conga);
-addConnection(music,string,violin);
-addConnection(music,string,banjo);
-addConnection(music,string,ukulele);
-addConnection(music,string,harp);
 addConnection(music,string,cello);
+addConnection(music,string,violin);
 addConnection(music,string,bass);
-addConnection(music,wind,recorder);
-addConnection(music,wind,flute);
-addConnection(music,wind,accordion);
-addConnection(music,wind,bagpipe);
-addConnection(music,brass,trumpet);
-addConnection(music,brass,horn);
-addConnection(music,brass,trombone);
-addConnection(music,brass,tuba);
-addConnection(music,brass,bugle);
-addConnection(music,brass,saxophone);
-addConnection(music,percussion,triangle);
-addConnection(music,percussion,cowbell);
-addConnection(music,percussion,xylophone);
-addConnection(music,percussion,bongo);
-addConnection(music,percussion,conga);
 //cello tree
 var strings=[addNode("strings"),addNode("strings"),addNode("strings")];
 var fingering=[addNode("fingering"),addNode("fingering"),addNode("fingering")];
@@ -175,3 +121,4 @@ addNodeToTree(p4,javascript7);
 //c tree
 var c1=addNode("Assembly");
 addNodeToTree(p13,c1);
+</script>
