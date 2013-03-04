@@ -12,6 +12,8 @@ function drawGraph(ingraph){
 	var r = 720,
 	    x = d3.scale.linear().range([0, r]),
 	    y = d3.scale.linear().range([0, r]);
+	
+		$("#graph").html();
 	var svg = d3.select("#graph").append("svg")
 	.attr("width", w)
 	.attr("height", h)
@@ -68,7 +70,7 @@ function drawGraph(ingraph){
     .style("fill",function(d){return color(d.color);});
   node.append("text")
     //.attr("text-anchor", "middle")
-    .attr("dx",22)
+    .attr("dx",function(d){return 32-3*d.level})
     .attr("dy",".35em")
     .text(function(d) {return d.name});
 
@@ -118,10 +120,41 @@ function drawGraph(ingraph){
       node.attr("transform", function(d) {return "translate("+d.x+","+d.y+")"; });
       });
 
-	  updateCircleColors();
+	  updateCircleColors();	
+		var e=$("#graph svg g");
+		for(var i=0;i<e.length;i++) {
+			var id=e[i].firstChild.className.baseVal;
+			fb.child("node").child(id).once("value",function(data) {
+				if(data.val()!=null) {
+					$("#graph svg g circle."+data.name()).parent()[0].onclick=function() {
+						$("#back").text("Go Back");
+						$("#back").addClass("btn");
+						$("#back").addClass("btn-danger");
+						goToTheNodePage(data.name());
+					}
+				} else {
+					var selectNode=svg.select("."+data.name());
+					var level=selectNode[0][0]["parentNode"]["__data__"].level;
+					if(level==1) {
+						$("#graph svg g circle."+data.name()).parent()[0].onclick=function() {
+							switchToTopDir(data.name());
+						}
+					} else {
+						fb.child("tree").once("value",function(data2) {
+							data2.forEach(function(tree) {
+								if(tree.child("nodes").child(data.name()).val()!=null) {
+									$("#graph svg g circle."+data.name()).parent()[0].onclick=function() {
+										switchToSubCategory(tree.name(),data.name());
+									}
+								}
+							});
+						});
+					}
+				}
+			});
+		}
 }
 function treeView(nodeID){
-  console.log(graph.nodes);
   var svg = d3.select("#graph");
   var nodes = svg.selectAll(".node");
   /*
@@ -142,7 +175,10 @@ function treeView(nodeID){
   for(var i=0;levels[i].length>0;i++){
     levels[i+1]=[];
     levels[i].forEach(function(node){
-      levels[i+1] = levels[i+1].concat(transTable[node].children);});
+		if(transTable[node]!=undefined) {
+      levels[i+1] = levels[i+1].concat(transTable[node].children);
+	}
+	});
   }
   force.linkStrength(0.5).resume();
   treeMode=true;

@@ -12,8 +12,8 @@ var possibleGoals=[];
 var listGoals=[];
 var searched=false;
 var currNode="";
-fb.once("value", function(data) {
-	data.child("tree").forEach(function(t) {
+fb.child("tree").once("value", function(data) {
+	data.forEach(function(t) {
 		var tree=new Object();
 		tree.type="tree";
 		tree.id=t.name();
@@ -45,7 +45,7 @@ $("#search").typeahead({
 						clearCategories();
 						switchToTutorialTree(newCategory.id);
 					} else {
-						switchToSubInDir(tree.name(),newCategory.id,switchToSubCategory);
+						switchToSubCategory(tree.name(),newCategory.id);
 					}
 				}
 			});
@@ -223,6 +223,7 @@ function addSkillTrees(trees,edges,lookup,startSpot) {
 								var dictionary=new Object();
 								dictionary.nodes=trees;
 								dictionary.links=edges;
+								console.log(dictionary);
 								drawGraph(dictionary);
 							}
 						}
@@ -732,11 +733,13 @@ function updateCircleColors() {
 			fb.child("node").child(id2).once("value",function(d) {
 				if(d.val()!=null) {
 					var id=d.name();
-					if(data.child(id).val()==null) {
-						$("#graph svg g circle."+id).css("fill","#DD0000");
-					} else {
-						$("#graph svg g circle."+id).css("fill","#00DD00");
-					}
+					userfb.child("completed").child(id).once("value", function(data) {
+						if(data.val()==null) {
+							$("#graph svg g circle."+data.name()).css("fill","#DD0000");
+						} else {
+							$("#graph svg g circle."+data.name()).css("fill","#00DD00");
+						}
+					});
 					userfb.child("completed").child(id).on("value", function(data) {
 						if(data.val()==null) {
 							$("#graph svg g circle."+data.name()).css("fill","#DD0000");
