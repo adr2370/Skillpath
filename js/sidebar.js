@@ -43,8 +43,8 @@ $("#search").typeahead({
 					});
 					if(count==0) {
 						$("#path").html($("#path").html()+newCategory.name+"/");
-						clearCategories();
 						switchToTutorialTree(newCategory.id);
+						clearCategories();
 					} else {
 						switchToSubCategory(tree.name(),newCategory.id);
 					}
@@ -415,7 +415,9 @@ function clearCategories() {
 	unHighlightNodes(highlightedNodes);
 	$("#nodeCon").hide();
 	$("#graph").show();
-	dirLevels[dirLevels.length]=$("#categories").html();
+	if(dirLevels.length<oldTrees.length) {
+		dirLevels[dirLevels.length]=$("#categories").html();
+	}
 	$("#categories").html("");
 	$("#back").text("Go Back");
 	$("#back").addClass("btn");
@@ -429,8 +431,8 @@ function addToPath(id,type) {
 function switchToSubInDir(id,child,callback) {
 	currCategoryTree=id;
 	addToPath(id,"tree");
-	clearCategories();
 	getTreeData(id,"next",drawTree);
+	clearCategories();
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		var count=0;
 		dtop.forEach(function(data) {
@@ -449,8 +451,8 @@ function switchToSubInDir(id,child,callback) {
 function switchToTopDir(id) {
 	currCategoryTree=id;
 	addToPath(id,"tree");
-	clearCategories();
 	getTreeData(id,"next",drawTree);
+	clearCategories();
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		dtop.forEach(function(data) {
 			fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
@@ -462,7 +464,6 @@ function switchToTopDir(id) {
 }
 function switchToSubCategory(treeid,id) {
 	addToPath(id,"tree");
-	clearCategories();
 	//check if it is a leaf
 	fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
 		var count=0;
@@ -472,6 +473,7 @@ function switchToSubCategory(treeid,id) {
 			switchToTutorialTree(id);
 		} else {
 			getTreeData(id,"next",drawTree);
+			clearCategories();
 			dtop.forEach(function(data) {
 				fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
 					addToCategoryList(data.name(),data2.val(),false);
@@ -486,6 +488,7 @@ function switchToTutorialTree(id) {
 	inTutorials=true;
 	howFarIn=dirLevels.length;
 	getTreeData(id,"next",drawTree);
+	clearCategories();
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
 		dtop.forEach(function(data) {
 			fb.child("node").child(data.name()).child("name").once("value", function(data2) {
@@ -498,8 +501,8 @@ function switchToTutorialTree(id) {
 }
 function switchToSubTutorialTree(treeid,id) {
 	addToPath(id,"node");
-	clearCategories();
 	getTreeData(id,"next",drawTree);
+	clearCategories();
 	fb.child("tree").child(treeid).child("nodes").child(id).child("children").once("value", function(dtop) {
 		var count=0;
 		dtop.forEach(function() {count++;}); //count the children
@@ -519,7 +522,7 @@ function switchToSubTutorialTree(treeid,id) {
 }
 function getTreeData(treeid,type,callback) {
 	currNode=treeid;
-	if(type=="next") {
+	if(type=="next"&&oldTrees[oldTrees.length-1]!=currNode) {
 		oldTrees[oldTrees.length]=currNode;
 	}
 	treeView(treeid);
@@ -736,20 +739,17 @@ function drawTree(inNodes, inLevels) {
 }
 function updateCircleColors() {
 	userfb.child("completed").once("value", function(data) {
-		if(data.val()==null) return;
 		var circleArray = $("#graph svg g circle");
 		for(var i=1;i<circleArray.length;i++) {
 			var id2=circleArray[i].className.baseVal;
 			fb.child("node").child(id2).once("value",function(d) {
 				if(d.val()!=null) {
 					var id=d.name();
-					userfb.child("completed").child(id).once("value", function(data) {
-						if(data.val()==null) {
-							$("#graph svg g circle."+data.name()).css("fill","#DD0000");
-						} else {
-							$("#graph svg g circle."+data.name()).css("fill","#00DD00");
-						}
-					});
+					if(data.child(id).val()==null) {
+						$("#graph svg g circle."+id).css("fill","#DD0000");
+					} else {
+						$("#graph svg g circle."+id).css("fill","#00DD00");
+					}
 					userfb.child("completed").child(id).on("value", function(data) {
 						if(data.val()==null) {
 							$("#graph svg g circle."+data.name()).css("fill","#DD0000");

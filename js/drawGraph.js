@@ -4,6 +4,7 @@ var graph;
 var force;
 var w;
 var h,link,node,levels,svg;
+var firstTick=true;
 
 function drawGraph(ingraph){
   graph=ingraph;
@@ -106,12 +107,15 @@ function drawGraph(ingraph){
       else{
         graph.nodes[0].x += (w / 2 - graph.nodes[0].x)*k;
         graph.nodes[0].y += (h / 2 - graph.nodes[0].y)*k;
-        for(var i=0;i<graph.nodes.length;i++) {
-          if(graph.nodes[i].x>w) graph.nodes[i].x=w;
-          if(graph.nodes[i].x<0) graph.nodes[i].x=0;
-          if(graph.nodes[i].y>h) graph.nodes[i].y=h;
-          if(graph.nodes[i].y<0) graph.nodes[i].y=0;
-        }
+        if(firstTick) {
+			for(var i=0;i<graph.nodes.length;i++) {
+	          if(graph.nodes[i].x>w) graph.nodes[i].x=w;
+	          if(graph.nodes[i].x<0) graph.nodes[i].x=0;
+	          if(graph.nodes[i].y>h) graph.nodes[i].y=h;
+	          if(graph.nodes[i].y<0) graph.nodes[i].y=0;
+        	}
+			firstTick=false;
+		}
       }
       link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
