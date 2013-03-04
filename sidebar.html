@@ -108,6 +108,7 @@
 							}
 						});
 						if(!found) {
+							addUserCategory(userid,newCategory.id);
 							switchToTopDir(newCategory.id);
 						}
 					});
@@ -288,7 +289,9 @@
 				$('#addingGoal').show();
 				$("#addGoalButton").text("Hide");
 				$("#addGoalButton").attr("onclick","hideAddingGoal();");
-				fb.child("user").child(userid).once("value", function(data) {
+				fb.child("user").child(userid).on("value", function(data) {
+					listGoals=[];
+					possibleGoals=[];
 					data.child("categories").forEach(function(category) {
 						fb.child("tree").child(category.name()).once("value", function(trees) {
 							trees.child("nodes").forEach(function(tree) {
@@ -327,10 +330,12 @@
 				possibleGoals=[];
 			}
 			function backToBeginning() {
+				$("#graph").html("");
 				$("#back").text("");
 				$("#back").removeClass("btn");
 				$("#back").removeClass("btn-danger");
 				$("#path").html("/");
+				$("#back").attr("onclick","goBack();");
 				$("#categories").html(dirLevels[0]);
 				dirLevels=[];
 				oldTrees=[];
@@ -341,7 +346,12 @@
 				}
 			}
 			function getPathUp(treeid,id) {
+				searched=true;
 				backToBeginning();
+				$("#back").text("Go Back");
+				$("#back").addClass("btn");
+				$("#back").addClass("btn-danger");
+				$("#back").attr("onclick","backToBeginning();");
 				//find which category the treeid belongs to
 				var category="";
 				fb.child("user").child(userid).child("categories").once("value", function(data) {
@@ -407,6 +417,7 @@
 				}
 			}
 			function goBack() {
+				console.log("HERE");
 				if(dirLevels.length<=1) {
 					$("#back").text("");
 					$("#back").removeClass("btn");
@@ -738,24 +749,25 @@
 				updateCircleColors();
 			}
 			function updateCircleColors() {
-				var circleArray = $("#graph svg g circle");
-				for(var i=1;i<circleArray.length;i++) {
-					var id=circleArray[i].id;
-					userfb.child("completed").child(id).once("value", function(data) {
-						if(data.val()==null) {
+				userfb.child("completed").once("value", function(data) {
+					if(data.val()==null) return;
+					var circleArray = $("#graph svg g circle");
+					for(var i=1;i<circleArray.length;i++) {
+						var id=circleArray[i].id;
+						if(data.child(id).val()==null) {
 							$("#graph svg g #"+data.name()).css("fill","#DD0000");
 						} else {
 							$("#graph svg g #"+data.name()).css("fill","#00DD00");
 						}
-					});
-					userfb.child("completed").child(id).on("value", function(data) {
-						if(data.val()==null) {
-							$("#graph svg g #"+data.name()).css("fill","#DD0000");
-						} else {
-							$("#graph svg g #"+data.name()).css("fill","#00DD00");
-						}
-					});
-				}
+						userfb.child("completed").child(id).on("value", function(data) {
+							if(data.val()==null) {
+								$("#graph svg g #"+data.name()).css("fill","#DD0000");
+							} else {
+								$("#graph svg g #"+data.name()).css("fill","#00DD00");
+							}
+						});
+					}
+				});
 			}
 			function goToNode(id) {
 				if(inTutorials) {
