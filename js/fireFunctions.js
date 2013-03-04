@@ -16,19 +16,49 @@ function removeConnection(tree,parent,child) {
 	updateNodeLevel(tree,child);
 }
 function addLink(node,url) {
-	return fb.child("node").child(node).child("links").child(url).set({down: 0, up: 0}).name();
+	return fb.child("node").child(node).child("links").child(window.btoa(url)).set({down: 0, up: 0, url: window.btoa(url)});
 }
 function removeLink(node,url) {
-	fb.child("node").child(node).child("links").child(url).set(null);
+	fb.child("node").child(node).child("links").child(window.btoa(url)).set(null);
 }
-function addDownVote(node,link) {
-	fb.child("node").child(node).child("links").child(link).child("down").once("value", function(dataSnapshot) {
-		fb.child("node").child(node).child("links").child(link).child("down").set(dataSnapshot.val()+1);
+function addUpVote(node,link,userid) {
+	var linkRef = fb.child("node").child(node).child("links").child(link);
+	linkRef.child("voters").child(userid).once("value", function(position) {
+		if ( position.val() === 'up' ) {
+		} else if ( position.val() === 'down' ) {
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()-1);
+			});
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("up");
+		} else {
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("up");
+		}
 	});
 }
-function addUpVote(node,link) {
-	fb.child("node").child(node).child("links").child(link).child("up").once("value", function(dataSnapshot) {
-		fb.child("node").child(node).child("links").child(link).child("up").set(dataSnapshot.val()+1);
+function addDownVote(node,link,userid) {
+	var linkRef = fb.child("node").child(node).child("links").child(link);
+	linkRef.child("voters").child(userid).once("value", function(position) {
+		if ( position.val() === 'down' ) {
+		} else if ( position.val() === 'up' ) {
+			linkRef.child("up").once("value", function(up) {
+				linkRef.child("up").set(up.val()-1);
+			});
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("down");
+		} else {
+			linkRef.child("down").once("value", function(down) {
+				linkRef.child("down").set(down.val()+1);
+			});
+			linkRef.child("voters").child(userid).set("down");
+		}
 	});
 }
 function addTree(name,type) {
@@ -70,25 +100,82 @@ function updateNodeLevel(tree,node) {
 }
 function changeNodeLevel(tree,node,newLevel) {
 	fb.child("tree").child(tree).child("nodes").child(node).child("level").once("value", function(dataSnapshot) {
-		fb.child("tree").child(tree).child("levels").child(dataSnapshot.val()).child(node).set(null);
+		try {
+			fb.child("tree").child(tree).child("levels").child(dataSnapshot.val()).child(node).set(null);
+		}
+		catch(err) {}
 		fb.child("tree").child(tree).child("levels").child(newLevel).child(node).set(1);
 		fb.child("tree").child(tree).child("nodes").child(node).child("level").set(newLevel);
 	});
 }
 function addUser(userid,name,photo,email) {
-	fb.child("user").child(userid).set({name: name, photo: photo, email: email});
+	fb.child("user").child(userid).child("name").set(name);
+	fb.child("user").child(userid).child("photo").set(photo);
+	fb.child("user").child(userid).child("email").set(email);
 }
 function removeUser(userid) {
 	fb.child("user").child(userid).set(null);
 }
-function addUserCategory(userid,category) {
-	fb.child("user").child(userid).child("categories").child(category).set(1);
+function addUserCategory(userid,category,finalDes,found) {
+	fb.child("user").child(userid).child("categories").child(category).once("value", function(data) {
+		if(data.val()==null) {
+			var trees=[];
+			var lookup=[];
+			trees[0]={name:"me", id:0, index:0, color:0, level:0, children:[]};
+			lookup[0]=0;
+			var edges=[];
+			var count=1;
+			var overallCount=0;
+			var tree=category;
+			fb.child("tree").child(tree).child("name").once("value", function(d) {
+				var t=new Object();
+				t.id=tree;
+				t.name=d.val();
+				overallCount++;
+				t.color=overallCount;
+				t.index=trees.length;
+				t.children=[];
+				lookup[t.id]=t.index;
+				t.level=1;
+				trees[0].children.push(t.id);
+				trees.push(t);
+				edges.push({source:0,target:trees.length-1,value:10});
+				count--;
+				if(count==0) {
+					addCategoryTrees(trees,edges,lookup);
+				}
+			});
+			fb.child("user").child(userid).child("categories").child(category).set(1);
+		} else {
+			fb.child("tree").child(category).once("value", function(tree) {
+				if(!found) {
+					addUserCategory(userid,finalDes,finalDes,found);
+					switchToTopDir(finalDes);
+				} else {
+					var count=0;
+					tree.child("nodes").child(finalDes).child("children").forEach(function(d){
+						count++;
+					});
+					if(count==0) {
+						fb.child("tree").child(finalDes).child("name").once("value", function(d) {
+							$("#path").html($("#path").html()+d.val()+"/");
+						});
+						switchToTutorialTree(finalDes);
+						clearCategories();
+					} else {
+						switchToSubCategory(tree.name(),finalDes);
+					}
+				}
+				treeView(finalDes);
+			});
+		}
+	});
 }
 function addCompletedNode(userid,node) {
 	fb.child("user").child(userid).child("completed").child(node).set(1);
 }
-function addGoal(userid,node) {
-	fb.child("user").child(userid).child("goals").child(node).set(1);
+function addGoal(userid,tree,node) {
+	fb.child("user").child(userid).child("goals").child(node).set(tree);
 }
 function removeUserCategory(userid,category) {
 	fb.child("user").child(userid).child("categories").child(category).set(null);
