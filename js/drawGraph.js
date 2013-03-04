@@ -32,7 +32,7 @@ function drawGraph(graph){
     .gravity(0.3)
     .size([width, height]);
 
-  repulsion = -3700*Math.sqrt(graph.nodes.length);
+  repulsion = -1700*Math.sqrt(graph.nodes.length);
   force
     .charge(repulsion)
     .nodes(graph.nodes)
