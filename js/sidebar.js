@@ -450,15 +450,21 @@ function switchToSubInDir(id,child,callback) {
 function switchToTopDir(id) {
 	currCategoryTree=id;
 	addToPath(id,"tree");
-	getTreeData(id,"next",drawTree);
-	clearCategories();
 	fb.child("tree").child(id).child("levels").child("0").once("value", function(dtop) {
+		var count=0;
 		dtop.forEach(function(data) {
+			count++;
 			fb.child("tree").child(data.name()).child("name").once("value", function(data2) {
 				addToCategoryList(data.name(),data2.val(),false);
 				$("#"+data.name()).attr("onclick","switchToSubCategory('"+id+"','"+data.name()+"');");
 			});
 		});
+		if(count==0) {
+			switchToTutorialTree(id);
+		} else {
+			getTreeData(id,"next",drawTree);
+			clearCategories();
+		}
 	});
 }
 function switchToSubCategory(treeid,id) {
@@ -483,6 +489,7 @@ function switchToSubCategory(treeid,id) {
 	});
 }
 function switchToTutorialTree(id) {
+	console.log(id);
 	currTutorialTree=id;
 	inTutorials=true;
 	howFarIn=dirLevels.length;
