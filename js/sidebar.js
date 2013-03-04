@@ -363,6 +363,8 @@ function addToCategoryList(id,name,checkbox) {
 	}
 }
 function goBack() {
+	$("#nodeCon").hide();
+	$("#graph").show();
 	if(dirLevels.length<=1) {
 		$("#back").text("");
 		$("#back").removeClass("btn");
@@ -389,6 +391,8 @@ function goBack() {
 	updateCircleColors();
 }
 function clearCategories() {
+	$("#nodeCon").hide();
+	$("#graph").show();
 	dirLevels[dirLevels.length]=$("#categories").html();
 	oldTrees[oldTrees.length]=$("#graph").html();
 	$("#categories").html("");
@@ -679,7 +683,7 @@ function drawTree(inNodes, inLevels) {
 	    .attr("cx", function(d) { return d.x })
 	    .attr("cy", function(d) { return d.y })
 		.attr("id", function(d) { return d.id })
-		.attr("onclick", function(d) { return "goToNode('"+d.id+"');" })
+		.attr("onclick", function(d) { return "goToTheNodePage('"+d.id+"');" })
 	    .style("fill", function(d) { return color(5); })
 	  .append("title")
 	    .text(function(d) { return d.name; });
