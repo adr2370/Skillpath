@@ -392,7 +392,7 @@ function goBack() {
 		} else {
 			backToBeginning();
 		}
-		if(dirLevels.length<=1) {
+		if(dirLevels.length<=0) {
 			$("#back").text("");
 			$("#back").removeClass("btn");
 			$("#back").removeClass("btn-danger");
