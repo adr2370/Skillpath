@@ -103,32 +103,13 @@ var p2=addTree("Web","tree");
 var p3=addTree("Html","node");
 var p4=addTree("Javascript","node");
 var p5=addTree("CSS","node");
-var p6=addTree("PHP","node");
-var p8=addTree("High level","tree");
-var p9=addTree("C++","node");
-var p10=addTree("Java","node");
-var p11=addTree("Python","node");
-var p12=addTree("Low level","tree");
-var p13=addTree("C","node");
 addNodeToTree(p1,p2);
 addNodeToTree(p1,p3);
 addNodeToTree(p1,p4);
 addNodeToTree(p1,p5);
-addNodeToTree(p1,p6);
-addNodeToTree(p1,p8);
-addNodeToTree(p1,p9);
-addNodeToTree(p1,p10);
-addNodeToTree(p1,p11);
-addNodeToTree(p1,p12);
-addNodeToTree(p1,p13);
 addConnection(p1,p2,p3);
 addConnection(p1,p2,p4);
 addConnection(p1,p2,p5);
-addConnection(p1,p2,p6);
-addConnection(p1,p8,p9);
-addConnection(p1,p8,p10);
-addConnection(p1,p8,p11);
-addConnection(p1,p12,p13);
 //html tree
 var html1=addNode("Basics");
 var html2=addNode("Elements");
@@ -170,9 +151,6 @@ addNodeToTree(p4,javascript4);
 addNodeToTree(p4,javascript5);
 addNodeToTree(p4,javascript6);
 addNodeToTree(p4,javascript7);
-//c tree
-var c1=addNode("Assembly");
-addNodeToTree(p13,c1);
 
 //Sports tree
 var s1=addTree("Sports","tree");
