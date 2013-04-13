@@ -7,6 +7,7 @@ var h,link,node,levels,svg;
 var firstTick=true;
 
 function drawGraph(ingraph){
+  console.log(ingraph);
   newGraph = graph == null;
   if(newGraph){
     graph=ingraph;
